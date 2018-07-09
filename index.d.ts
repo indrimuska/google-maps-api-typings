@@ -183,13 +183,20 @@ declare module '@google/maps' {
         distanceMatrix(query: DistanceMatrixRequest, callback?: ResponseCallback<DistanceMatrixResponse>): RequestHandle<DistanceMatrixResponse>;
         /**
          * The Elevation API provides a simple interface to query locations on the earth for elevation data.
-         * Additionally, you may request sampled elevation data along paths, allowing you to calculate elevation changes along routes.
          * With the Elevation API, you can develop hiking and biking applications, positioning applications,
          * or low resolution surveying applications.
          * 
          * @see https://developers.google.com/maps/documentation/elevation/intro
          */
         elevation(query: ElevationRequest, callback?: ResponseCallback<ElevationResponse>): RequestHandle<ElevationResponse>;
+        /**
+         * You may request sampled elevation data along paths, allowing you to calculate elevation changes along routes.
+         * With the Elevation API, you can develop hiking and biking applications, positioning applications,
+         * or low resolution surveying applications.
+         * 
+         * @see https://developers.google.com/maps/documentation/elevation/intro
+         */
+        elevationAlongPath(query: ElevationAlongPathRequest, callback?: ResponseCallback<ElevationResponse>): RequestHandle<ElevationResponse>;
     }
 
     export interface DirectionsRequest {
@@ -1174,5 +1181,18 @@ declare module '@google/maps' {
          * To obtain the most accurate elevation value for a point, it should be queried independently.
          */
         resolution: number;
+    }
+
+    export interface ElevationAlongPathRequest {
+        /**
+         * defines a path on the earth for which to return elevation data.
+         * This parameter defines a set of two or more ordered {latitude,longitude} pairs defining a path along the surface of the earth.
+         */
+        path: Array<LatLng> | string;
+        /**
+         * specifies the number of sample points along a path for which to return elevation data.
+         * The samples parameter divides the given path into an ordered set of equidistant points along the path.
+         */
+        samples: number;
     }
 }
