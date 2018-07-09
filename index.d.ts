@@ -172,7 +172,7 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/directions/intro
          */
-        directions(query: DirectionsRequest, callback?: ResponseCallback<DirectionsResult>): RequestHandle<DirectionsResult>;
+        directions(query: DirectionsRequest, callback?: ResponseCallback<DirectionsResponse>): RequestHandle<DirectionsResponse>;
         /**
          * The Distance Matrix API is a service that provides travel distance and time for a matrix of origins and destinations.
          * The API returns information based on the recommended route between start and end points, as calculated by the Google Maps API,
@@ -180,7 +180,16 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/distance-matrix/intro
          */
-        distanceMatrix(query: DistanceMatrixRequest, callback?: ResponseCallback<DistanceMatrixResult>): RequestHandle<DistanceMatrixResult>;
+        distanceMatrix(query: DistanceMatrixRequest, callback?: ResponseCallback<DistanceMatrixResponse>): RequestHandle<DistanceMatrixResponse>;
+        /**
+         * The Elevation API provides a simple interface to query locations on the earth for elevation data.
+         * Additionally, you may request sampled elevation data along paths, allowing you to calculate elevation changes along routes.
+         * With the Elevation API, you can develop hiking and biking applications, positioning applications,
+         * or low resolution surveying applications.
+         * 
+         * @see https://developers.google.com/maps/documentation/elevation/intro
+         */
+        elevation(query: ElevationRequest, callback?: ResponseCallback<ElevationResponse>): RequestHandle<ElevationResponse>;
     }
 
     export interface DirectionsRequest {
@@ -335,9 +344,9 @@ declare module '@google/maps' {
         imperial = 'imperial',
     }
 
-    export interface DirectionsResult {
+    export interface DirectionsResponse {
         /** contains metadata on the request */
-        status: DirectionsResultStatus;
+        status: DirectionsReponseStatus;
         /** contains an array with details about the geocoding of origin, destination and waypoints */
         geocoded_waypoints: DirectionsGeocodedWaypoint[];
         /** contains an array of routes from the origin to the destination */
@@ -395,7 +404,7 @@ declare module '@google/maps' {
      * The `status` field within the Directions response object contains the status of the request, and may contain debugging information
      * to help you track down why the Directions service failed.
      */
-    export enum DirectionsResultStatus {
+    export enum DirectionsReponseStatus {
         /** indicates the response contains a valid `result`. */
         OK = 'OK',
         /** indicates at least one of the locations specified in the request's origin, destination, or waypoints could not be geocoded. */
@@ -998,9 +1007,9 @@ declare module '@google/maps' {
         transit_routing_preference?: TransitRoutingPreference;
     }
 
-    export interface DistanceMatrixResult {
+    export interface DistanceMatrixResponse {
         /** contains metadata on the request. See Status Codes below. */
-        status: DistanceMatrixResultTopLevelStatus;
+        status: DistanceMatrixResponseTopLevelStatus;
         /**
          * When the top-level status code is other than `OK`, this field contains more detailed information
          * about the reasons behind the given status code.
@@ -1025,7 +1034,7 @@ declare module '@google/maps' {
      * The Distance Matrix API returns a top-level status field, with information about the request in general,
      * as well as a status field for each element field, with information about that particular origin-destination pairing.
      */
-    export enum DistanceMatrixResultTopLevelStatus {
+    export enum DistanceMatrixResponseTopLevelStatus {
         /** indicates the response contains a valid result */
         OK = 'OK',
         /** indicates that the provided request was invalid */
@@ -1049,7 +1058,7 @@ declare module '@google/maps' {
         UNKNOWN_ERROR = 'UNKNOWN_ERROR',
     }
 
-    export enum DistanceMatrixResultElementLevelStatus {
+    export enum DistanceMatrixResponseElementLevelStatus {
         /** indicates the response contains a valid result */
         OK = 'OK',
         /** indicates that the origin and/or destination of this pairing could not be geocoded */
@@ -1077,7 +1086,7 @@ declare module '@google/maps' {
     /** The information about each origin-destination pairing is returned in an `element` entry */
     export interface DistanceMatrixRowElement {
         /** possible status codes  */
-        status: DistanceMatrixResultElementLevelStatus;
+        status: DistanceMatrixResponseElementLevelStatus;
         /**
          * The length of time it takes to travel this route, expressed in seconds (the `value` field) and as `text`.
          * The textual representation is localized according to the query's `language` parameter.
@@ -1105,5 +1114,65 @@ declare module '@google/maps' {
          * This property is only returned for transit requests and only for transit providers where fare information is available.
          */
         fare: TransitFare;
+    }
+
+    export interface ElevationRequest {
+        /**
+         * defines the location(s) on the earth from which to return elevation data.
+         * This parameter takes either a single location as a comma-separated {latitude,longitude} pair (e.g. "40.714728,-73.998672")
+         * or multiple latitude/longitude pairs passed as an array or as an encoded polyline.
+         */
+        locations: Array<LatLng>;
+    }
+
+    export interface ElevationResponse {
+        /** An Elevation status code */
+        status: ElevationResponseStatus;
+        /**
+         * When the status code is other than `OK`, there may be an additional `error_message` field within the Elevation response object.
+         * This field contains more detailed information about the reasons behind the given status code.
+         */
+        error_message: string;
+        /** An Elevation results array */
+        results: ElevationResult[];
+    }
+
+    export enum ElevationResponseStatus {
+        /** indicating the API request was successful */
+        OK = 'OK',
+        /** indicating the API request was malformed */
+        INVALID_REQUEST = 'INVALID_REQUEST',
+        /**
+         * indicating any of the following:
+         * The API key is missing or invalid.
+         *  - Billing has not been enabled on your account.
+         *  - A self-imposed usage cap has been exceeded.
+         *  - The provided method of payment is no longer valid (for example, a credit card has expired).
+         * See the [Maps FAQ](https://developers.google.com/maps/faq#over-limit-key-error) to learn how to fix this.
+         */
+        OVER_DAILY_LIMIT = 'OVER_DAILY_LIMIT',
+        /** indicating the requestor has exceeded quota */
+        OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+        /** indicating the API did not complete the request */
+        REQUEST_DENIED = 'REQUEST_DENIED',
+        /** indicating an unknown error */
+        UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+    }
+
+    export interface ElevationResult {
+        /**
+         * A `location` element (containing `lat` and `lng` elements) of the position for which elevation data is being computed.
+         * Note that for path requests, the set of `location` elements will contain the sampled points along the path.
+         */
+        location: LatLng;
+        /** An `elevation` element indicating the elevation of the location in meters */
+        elevation: number;
+        /**
+         * A `resolution` value, indicating the maximum distance between data points from which the elevation was interpolated, in meters.
+         * This property will be missing if the resolution is not known.
+         * Note that elevation data becomes more coarse (larger `resolution` values) when multiple points are passed.
+         * To obtain the most accurate elevation value for a point, it should be queried independently.
+         */
+        resolution: number;
     }
 }
