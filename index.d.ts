@@ -100,6 +100,14 @@ declare module '@google/maps' {
         { latitude: number; longitude: number }
     );
 
+    /** The bounds parameter defines the latitude/longitude coordinates of the southwest and northeast corners of this bounding box */
+    export interface LatLngBounds {
+        south: number;
+        west: number;
+        north: number;
+        east: number;
+    }
+
     /** @see https://developers.google.com/maps/faq#languagesupport */
     export enum Language {
         Arabic = 'ar',
@@ -197,6 +205,18 @@ declare module '@google/maps' {
          * @see https://developers.google.com/maps/documentation/elevation/intro
          */
         elevationAlongPath(query: ElevationAlongPathRequest, callback?: ResponseCallback<ElevationResponse>): RequestHandle<ElevationResponse>;
+        /**
+         * 
+         */
+        findPlace(query: FindPlaceRequest, callback?: ResponseCallback<FindPlaceResponse>): RequestHandle<FindPlaceResponse>;
+        /**
+         * Geocoding is the process of converting addresses (like "1600 Amphitheatre Parkway, Mountain View, CA")
+         * into geographic coordinates (like latitude 37.423021 and longitude -122.083739),
+         * which you can use to place markers on a map, or position the map.
+         * 
+         * @see https://developers.google.com/maps/documentation/geocoding/intro
+         */
+        geocode(query: GeocodeRequest, callback?: ResponseCallback<GeocodeResponse>): RequestHandle<GeocodeResponse>;
     }
 
     export interface DirectionsRequest {
@@ -875,7 +895,10 @@ declare module '@google/maps' {
         colloquial_area = 'colloquial_area',
         /** indicates an incorporated city or town political entity. */
         locality = 'locality',
-        /** indicates a specific type of Japanese locality, to facilitate distinction between multiple locality components within a Japanese address. */
+        /**
+         * indicates a specific type of Japanese locality,
+         * to facilitate distinction between multiple locality components within a Japanese address.
+         */
         ward = 'ward',
         /**
          * indicates a first-order civil entity below a locality.
@@ -888,7 +911,10 @@ declare module '@google/maps' {
         neighborhood = 'neighborhood',
         /** indicates a named location, usually a building or collection of buildings with a common name */
         premise = 'premise',
-        /** indicates a first-order entity below a named location, usually a singular building within a collection of buildings with a common name */
+        /**
+         * indicates a first-order entity below a named location, usually a singular building within
+         * a collection of buildings with a common name
+         */
         subpremise = 'subpremise',
         /** indicates a postal code as used to address postal mail within the country. */
         postal_code = 'postal_code',
@@ -1194,5 +1220,291 @@ declare module '@google/maps' {
          * The samples parameter divides the given path into an ordered set of equidistant points along the path.
          */
         samples: number;
+    }
+
+    export interface FindPlaceRequest {}
+    export interface FindPlaceResponse {}
+
+    export interface GeocodeRequest {
+        /**
+         * The street address that you want to geocode, in the format used by the national postal service of the country concerned.
+         * Additional address elements such as business names and unit, suite or floor numbers should be avoided.
+         */
+        address?: string;
+        /**
+         * The bounding box of the viewport within which to bias geocode results more prominently.
+         * This parameter will only influence, not fully restrict, results from the geocoder.
+         */
+        bounds?: LatLngBounds;	
+        /**
+         * The language in which to return results.
+         *  - If `language` is not supplied, the geocoder attempts to use the preferred language as specified in the `Accept-Language` header,
+         *      or the native language of the domain from which the request is sent.
+         *  - The geocoder does its best to provide a street address that is readable for both the user and locals.
+         *      To achieve that goal, it returns street addresses in the local language, transliterated to a script readable
+         *      by the user if necessary, observing the preferred language. All other addresses are returned in the preferred language.
+         *      Address components are all returned in the same language, which is chosen from the first component.
+         *  - If a name is not available in the preferred language, the geocoder uses the closest match.
+         *  - The preferred language has a small influence on the set of results that the API chooses to return,
+         *      and the order in which they are returned. The geocoder interprets abbreviations differently depending on language,
+         *      such as the abbreviations for street types, or synonyms that may be valid in one language but not in another.
+         *      For example, utca and tér are synonyms for street in Hungarian.
+         */
+        language?: string;
+        /**
+         * The region code, specified as a ccTLD ("top-level domain") two-character value.
+         * This parameter will only influence, not fully restrict, results from the geocoder.
+         */
+        region?: string;
+        /**
+         * A components filter with elements separated by a pipe (`|`).
+         * The components filter is *required* if the request doesn't include an `address`.
+         * Each element in the components filter consists of a `component:value` pair, and fully restricts the results from the geocoder.
+         */
+        components?: GeocodeComponents;
+    }
+
+    /**
+     * Notes about component filtering:
+     * 
+     *  - If the request contains multiple component filters, the API evaluates them as an AND, not an OR.
+     *      For example, if the request includes multiple countries `components=country:GB|country:AU`,
+     *      the API looks for locations where country=GB AND country=AU, and returns `ZERO_RESULTS`.
+     *  - Results are consistent with Google Maps, which occasionally yields unexpected `ZERO_RESULTS` responses.
+     *      Using Place Autocomplete may provide better results in some use cases.
+     *      To learn more, see [this FAQ](https://developers.google.com/maps/documentation/geocoding/faq#trbl_component_filtering).
+     *  - For each address component, either specify it in the `address` parameter or in a `components` filter, but not both.
+     *      Specifying the same values in both may result in `ZERO_RESULTS`.
+     * 
+     * A geocode for "High St, Hastings" with `components=country:GB` returns a result in Hastings, England rather than in Hastings-On-Hudson, USA
+     */
+    export interface GeocodeComponents {
+        /** matches `postal_code` and `postal_code_prefix` */
+        postalCode?: string;
+        /**
+         * matches a country name or a two letter [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) country code.
+         * **Note:** The API follows the ISO standard for defining countries, and the filtering works best when using
+         * the corresponding ISO code of the country
+         */
+        country?: string | string[];
+        /** matches the long or short name of a route */
+        route?: string;
+        /** matches against `locality` and `sublocality` types */
+        locality?: string;
+        /** matches all the administrative_area levels */
+        administrativeArea?: string;
+    }
+
+    export interface GeocodeResponse {
+        /** contains metadata on the request */
+        status: GeocodeResponseStatus;
+        /**
+         * When the geocoder returns a status code other than `OK`, there may be an additional `error_message` field
+         * within the Geocoding response object. This field contains more detailed information about the reasons behind the given status code.
+         */
+        error_meesage: string;
+        /**
+         * contains an array of geocoded address information and geometry information.
+         * 
+         * Generally, only one entry in the `"results"` array is returned for address lookups,though the geocoder may return several results
+         * when address queries are ambiguous. 
+         */
+        results: GeocodeResult[];
+    }
+
+    /**
+     * The `"status" `field within the Geocoding response object contains the status of the request,
+     * and may contain debugging information to help you track down why geocoding is not working.
+     */
+    export enum GeocodeResponseStatus {
+        /** indicates that no errors occurred; the address was successfully parsed and at least one geocode was returned */
+        OK = 'OK',
+        /**
+         * indicates that the geocode was successful but returned no results.
+         * This may occur if the geocoder was passed a non-existent `address`.
+         */
+        ZERO_RESULTS = 'ZERO_RESULTS',
+        /**
+         * indicates any of the following:
+         *  - The API key is missing or invalid.
+         *  - Billing has not been enabled on your account.
+         *  - A self-imposed usage cap has been exceeded.
+         *  - The provided method of payment is no longer valid (for example, a credit card has expired).
+         * See the [Maps FAQ](https://developers.google.com/maps/faq#over-limit-key-error) to learn how to fix this.
+         */
+        OVER_DAILY_LIMIT = 'OVER_DAILY_LIMIT',
+        /** indicates that you are over your quota */
+        OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+        /** indicates that your request was denied */
+        REQUEST_DENIED = 'REQUEST_DENIED',
+        /** generally indicates that the query (`address`, `components` or `latlng`) is missing */
+        INVALID_REQUEST = 'INVALID_REQUEST',
+        /** indicates that the request could not be processed due to a server error. The request may succeed if you try again */
+        UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+    }
+
+    /**
+     * When the geocoder returns results, it places them within a (JSON) `results` array.
+     * Even if the geocoder returns no results (such as if the address doesn't exist) it still returns an empty `results` array.
+     * (XML responses consist of zero or more `<result>` elements.)
+     */
+    export interface GeocodeResult {
+        /**
+         * array indicates the type of the returned result.
+         * This array contains a set of zero or more tags identifying the type of feature returned in the result.
+         * For example, a geocode of "Chicago" returns "locality" which indicates that "Chicago" is a city,
+         * and also returns "political" which indicates it is a political entity.
+         */
+        types: (AddressType | GeocodeAddressType)[];
+        /**
+         * is a string containing the human-readable address of this location.
+         * 
+         * Often this address is equivalent to the postal address. Note that some countries, such as the United Kingdom,
+         * do not allow distribution of true postal addresses due to licensing restrictions.
+         * 
+         * The formatted address is logically composed of one or more address components.
+         * For example, the address "111 8th Avenue, New York, NY" consists of the following components: "111" (the street number),
+         * "8th Avenue" (the route), "New York" (the city) and "NY" (the US state).
+         * 
+         * Do not parse the formatted address programmatically. Instead you should use the individual address components,
+         * which the API response includes in addition to the formatted address field.
+         */
+        formatted_address: string;
+        /**
+         * is an array containing the separate components applicable to this address.
+         * 
+         * Note the following facts about the `address_components[]` array:
+         *  - The array of address components may contain more components than the `formatted_address`.
+         *  - The array does not necessarily include all the political entities that contain an address,
+         *      apart from those included in the `formatted_address`. To retrieve all the political entities that contain a specific address,
+         *      you should use reverse geocoding, passing the latitude/longitude of the address as a parameter to the request.
+         *  - The format of the response is not guaranteed to remain the same between requests.
+         *      In particular, the number of `address_components` varies based on the address requested and can change
+         *      over time for the same address. A component can change position in the array.
+         *      The type of the component can change. A particular component may be missing in a later response.
+         */
+        address_components: AddressComponent[];
+        /**
+         * is an array denoting all the localities contained in a postal code.
+         * This is only present when the result is a postal code that contains multiple localities.
+         */
+        postcode_localities: string[];
+        /** address geometry */
+        geometry: AddressGeometry;
+        /**
+         * is an encoded location reference, derived from latitude and longitude coordinates,
+         * that represents an area: 1/8000th of a degree by 1/8000th of a degree (about 14m x 14m at the equator) or smaller.
+         * Plus codes can be used as a replacement for street addresses in places where they do not exist
+         * (where buildings are not numbered or streets are not named).
+         * 
+         * The plus code is formatted as a global code and a compound code:
+         *  - `global_code` is a 4 character area code and 6 character or longer local code (849VCWC8+R9).
+         *  - `compound_code` is a 6 character or longer local code with an explicit location (CWC8+R9, Mountain View, CA, USA).
+         * Typically, both the global code and compound code are returned. However, if the result is in a remote location
+         * (for example, an ocean or desert) only the global code may be returned.
+         * 
+         * @see [Open Location Code](https://en.wikipedia.org/wiki/Open_Location_Code)
+         * @see [plus codes](https://plus.codes/)
+         */
+        plus_code: PlusCode;
+        /**
+         * indicates that the geocoder did not return an exact match for the original request,
+         * though it was able to match part of the requested address.
+         * You may wish to examine the original request for misspellings and/or an incomplete address.
+         * 
+         * Partial matches most often occur for street addresses that do not exist within the locality you pass in the request.
+         * Partial matches may also be returned when a request matches two or more locations in the same locality.
+         * For example, "21 Henr St, Bristol, UK" will return a partial match for both Henry Street and Henrietta Street.
+         * Note that if a request includes a misspelled address component, the geocoding service may suggest an alternative address.
+         * Suggestions triggered in this way will also be marked as a partial match.
+         */
+        partial_match: boolean;
+        /** is a unique identifier that can be used with other Google APIs */
+        place_id: string;
+    }
+
+    export enum GeocodeAddressType {
+        /** indicates the floor of a building address */
+        floor = 'floor',
+        /** typically indicates a place that has not yet been categorized */
+        establishment = 'establishment',
+        /** indicates a named point of interest */
+        point_of_interest = 'point_of_interest',
+        /** indicates a parking lot or parking structure */
+        parking = 'parking',
+        /** indicates a specific postal box */
+        post_box = 'post_box',
+        /** indicates a grouping of geographic areas, such as locality and sublocality, used for mailing addresses in some countries */
+        postal_town = 'postal_town',
+        /** indicates the room of a building address */
+        room = 'room',
+        /** indicates the precise street number */
+        street_number = 'street_number',
+        /**  indicate the location of a bus */
+        bus_station = 'bus_station',
+        /**  indicate the location of a train */
+        train_station = 'train_station',
+        /**  indicate the location of a public transit stop */
+        transit_station = 'transit_station',
+    }
+
+    export interface AddressComponent {
+        /** is an array indicating the *type* of the address component */
+        types: (AddressType | GeocodeAddressType)[];
+        /** is the full text description or name of the address component as returned by the Geocoder */
+        long_name: string;
+        /**
+         * is an abbreviated textual name for the address component, if available.
+         * For example, an address component for the state of Alaska may have a `long_name` of "Alaska" and a `short_name` of "AK"
+         * using the 2-letter postal abbreviation.
+         */
+        short_name: string;
+    }
+
+    export interface AddressGeometry {
+        /** contains the geocoded latitude, longitude value. For normal address lookups, this field is typically the most important. */
+        location: LatLng;
+        /** stores additional data about the specified location. */
+        location_type: LocationType;
+        /**
+         * contains the recommended viewport for displaying the returned result, specified as two latitude, longitude values
+         * defining the `southwest` and `northeast` corner of the viewport bounding box.
+         * Generally the viewport is used to frame a result when displaying it to a user.
+         */
+        viewport: LatLngBounds;
+        /**
+         * (optionally returned) stores the bounding box which can fully contain the returned result.
+         * Note that these bounds may not match the recommended viewport.
+         * (For example, San Francisco includes the [Farallon islands](https://en.wikipedia.org/wiki/Farallon_Islands),
+         * which are technically part of the city, but probably should not be returned in the viewport.)
+         */
+        bounds: LatLngBounds;
+    }
+
+    export enum LocationType {
+        /**
+         * indicates that the returned result is a precise geocode for which we have location information
+         * accurate down to street address precision
+         */
+        ROOFTOP = 'ROOFTOP',
+        /**
+         * indicates that the returned result reflects an approximation (usually on a road) interpolated between two precise points
+         * (such as intersections). Interpolated results are generally returned when rooftop geocodes are unavailable for a street address.
+         */
+        RANGE_INTERPOLATED = 'RANGE_INTERPOLATED',
+        /**
+         * indicates that the returned result is the geometric center of a result such as a polyline
+         * (for example, a street) or polygon (region).
+         */
+        GEOMETRIC_CENTER = 'GEOMETRIC_CENTER',
+        /** indicates that the returned result is approximate */
+        APPROXIMATE = 'APPROXIMATE',
+    }
+
+    export interface PlusCode {
+        /** is a 4 character area code and 6 character or longer local code (849VCWC8+R9). */
+        global_code: string;
+        /** is a 6 character or longer local code with an explicit location (CWC8+R9, Mountain View, CA, USA). */
+        compound_code: string;
     }
 }
