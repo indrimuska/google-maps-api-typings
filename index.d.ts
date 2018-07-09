@@ -206,9 +206,12 @@ declare module '@google/maps' {
          */
         elevationAlongPath(query: ElevationAlongPathRequest, callback?: ResponseCallback<ElevationResponse>): RequestHandle<ElevationResponse>;
         /**
+         * A Find Place request takes a text input, and returns a place.
+         * The text input can be any kind of Places data, for example, a name, address, or phone number.
          * 
+         * @see https://developers.google.com/places/web-service/search
          */
-        findPlace(query: FindPlaceRequest, callback?: ResponseCallback<FindPlaceResponse>): RequestHandle<FindPlaceResponse>;
+        findPlace(query: FindPlaceRequest, callback?: ResponseCallback<SearchResponse>): RequestHandle<SearchResponse>;
         /**
          * Geocoding is the process of converting addresses (like "1600 Amphitheatre Parkway, Mountain View, CA")
          * into geographic coordinates (like latitude 37.423021 and longitude -122.083739),
@@ -1222,8 +1225,209 @@ declare module '@google/maps' {
         samples: number;
     }
 
-    export interface FindPlaceRequest {}
-    export interface FindPlaceResponse {}
+    export interface FindPlaceRequest {
+        /** The text input specifying which place to search for (for example, a name, address, or phone number) */
+        input: string;
+        /** The type of input. This can be one of either `textquery` or `phonenumber` */
+        inputtype: string;
+        /**
+         * he language code, indicating in which language the results should be returned, if possible.
+         * Searches are also biased to the selected language; results in the selected language may be given a higher ranking
+         */
+        language?: Language;
+        /**
+         * The fields specifying the types of place data to return.
+         * 
+         * **Note:** If you omit the fields parameter from a Find Place request, only the place_id for the result will be returned.
+         */
+        fields?: Array<keyof SearchResponse>;
+        /**
+         * Prefer results in a specified area, by specifying either a radius plus lat/lng, or two lat/lng pairs representing
+         * the points of a rectangle. If this parameter is not specified, the API uses IP address biasing by default.
+         */
+        locationbias?: string;
+    }
+
+    export interface SearchResponse {
+        /** contains metadata on the request */
+        status: SearchResponseStatus;
+        /**
+         * When the Google Places service returns a status code other than `OK`, there may be an additional `error_message` field
+         * within the search response object. This field contains more detailed information about the reasons behind the given status code.
+         */
+        error_message: string;
+        /**
+         * contains an array of places, with information about each.
+         * The Places API returns up to 20 `establishment` results per query.
+         * Additionally, political results may be returned which serve to identify the area of the request.
+         */
+        results: SearchResult[];
+        /** may contain a set of attributions about this listing which must be displayed to the user (some listings may not have attribution) */
+        html_attributions: string[];
+        /**
+         * contains a token that can be used to return up to 20 additional results.
+         * A `next_page_token` will not be returned if there are no additional results to display.
+         * The maximum number of results that can be returned is 60.
+         * There is a short delay between when a `next_page_token` is issued, and when it will become valid.
+         */
+        next_page_token: string;
+    }
+
+    /**
+     * The `"status"` field within the search response object contains the status of the request,
+     * and may contain debugging information to help you track down why the request failed.
+     */
+    export enum SearchResponseStatus {
+        /** indicates that no errors occurred; the place was successfully detected and at least one result was returned */
+        OK = 'OK',
+        /**
+         * indicates that the search was successful but returned no results.
+         * This may occur if the search was passed a latlng in a remote location.
+         */
+        ZERO_RESULTS = 'ZERO_RESULTS',
+        /** indicates that you are over your quota */
+        OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+        /** indicates that your request was denied, generally because of lack of an invalid key parameter */
+        REQUEST_DENIED = 'REQUEST_DENIED',
+        /** generally indicates that a required query parameter (location or radius) is missing */
+        INVALID_REQUEST = 'INVALID_REQUEST',
+        /** indicates a server-side error; trying again may be successful */
+        UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+    }
+
+    /**
+     * When the Google Places service returns JSON results from a search, it places them within a `results` array.
+     * Even if the service returns no results (such as if the `location` is remote) it still returns an empty `results` array.
+     * XML responses consist of zero or more `<result>` elements.
+     */
+    export interface SearchResult {
+        /** contains the URL of a recommended icon which may be displayed to the user when indicating this result */
+        icon: string;
+        /**
+         * contains geometry information about the result, generally including the `location` (geocode)
+         * of the place and (optionally) the viewport identifying its general area of coverage
+         */
+        geometry: AddressGeometry;
+        /**
+         * is an encoded location reference, derived from latitude and longitude coordinates, that represents an area:
+         * 1/8000th of a degree by 1/8000th of a degree (about 14m x 14m at the equator) or smaller.
+         * Plus codes can be used as a replacement for street addresses in places where they do not exist
+         * (where buildings are not numbered or streets are not named).
+         * 
+         * The plus code is formatted as a global code and a compound code:
+         *  - `global_code` is a 4 character area code and 6 character or longer local code (849VCWC8+R9).
+         *  - `compound_code` is a 6 character or longer local code with an explicit location (CWC8+R9, Mountain View, CA, USA).
+         * 
+         * Typically, both the global code and compound code are returned.
+         * However, if the result is in a remote location (for example, an ocean or desert) only the global code may be returned.
+         * 
+         * @see [Open Location Code](https://en.wikipedia.org/wiki/Open_Location_Code)
+         * @see [plus codes](https://plus.codes/)
+         */
+        plus_code: PlusCode;
+        /** contains the human-readable name for the returned result. For `establishment` results, this is usually the business name */
+        name: string;
+        /** information on the opening hours */
+        opening_hours: OpeningHours;
+        /**
+         * an array of `photo` objects, each containing a reference to an image.
+         * A Place Search will return at most one `photo` object.
+         * Performing a Place Details request on the place may return up to ten photos.
+         * More information about Place Photos and how you can use the images in your application can be found in the
+         * [Place Photos](https://developers.google.com/places/web-service/photos) documentation.
+         */
+        photos: PlacePhoto[];
+        /**
+         * a textual identifier that uniquely identifies a place.
+         * To retrieve information about the place, pass this identifier in the `placeId` field of a Places API request
+         */
+        place_id: string;
+        /**
+         * Indicates the scope of the `place_id`.
+         * 
+         * **Note:** The `scope` field is included only in Nearby Search results and Place Details results.
+         * You can only retrieve app-scoped places via the Nearby Search and the Place Details requests.
+         * If the `scope` field is not present in a response, it is safe to assume the scope is `GOOGLE`.
+         */
+        scope: PlaceScope;
+        /**
+         * An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
+         * Note: This array may be empty or not present.
+         */
+        alt_ids: string[];
+        /** The price level of the place, on a scale of 0 to 4. The exact amount indicated by a specific value will vary from region to region */
+        price_level: PriceLevel;
+        /** contains the place's rating, from 1.0 to 5.0, based on aggregated user reviews */
+        rating: number;
+        /**
+         * contains an array of feature types describing the given result.
+         * See the [list of supported types](https://developers.google.com/places/web-service/supported_types#table2).
+         * XML responses include multiple `<type>` elements if more than one type is assigned to the result.
+         */
+        types: AddressType[];
+        /**
+         * contains a feature name of a nearby location. Often this feature refers to a street or neighborhood within the given results.
+         * The `vicinity` property is only returned for a Nearby Search.
+         */
+        vicinity: number;
+        /**
+         * is a string containing the human-readable address of this place. Often this address is equivalent to the "postal address".
+         * The `formatted_address` property is only returned for a Text Search.
+         */
+        formatted_address: string;
+        /**
+         * is a boolean flag indicating whether the place has permanently shut down (value `true`).
+         * If the place is not permanently closed, the flag is absent from the response.
+         */
+        permanently_closed: boolean;
+    }
+
+    export interface OpeningHours {
+        /** is a boolean value indicating if the place is open at the current time */
+        open_now: boolean;
+    }
+
+    export interface PlacePhoto {
+        /** a string used to identify the photo when you perform a Photo request */
+        photo_reference: string;
+        /** the maximum height of the image */
+        height: number;
+        /** the maximum width of the image */
+        width: number;
+        /** contains any required attributions. This field will always be present, but may be empty */
+        html_attributions: string[];
+    }
+
+    export enum PlaceScope {
+        /**
+         * The place ID is recognised by your application only.
+         * This is because your application added the place, and the place has not yet passed the moderation process.
+         */
+        APP = 'APP',
+        /** The place ID is available to other applications and on Google Maps */
+        GOOGLE = 'GOOGLE',
+    }
+
+    export enum PriceLevel {
+        Free = 0,
+        Inexpensive = 1,
+        Moderate = 2,
+        Expensive = 3,
+        VeryExpensive = 4,
+    }
+
+    export interface AlternativePlaceId {
+        /**
+         * The most likely reason for a place to have an alternative place ID is if your application adds a place and receives
+         * an application-scoped place ID, then later receives a Google-scoped place ID after passing the moderation process.
+         */
+        place_id: string;
+        /**
+         * The scope of an alternative place ID will always be `APP`,
+         * indicating that the alternative place ID is recognised by your application only.
+         */
+        scope: PlaceScope.APP;
+    }
 
     export interface GeocodeRequest {
         /**
