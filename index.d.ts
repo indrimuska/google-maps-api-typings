@@ -222,8 +222,14 @@ declare module '@google/maps' {
          * @see https://developers.google.com/maps/documentation/geocoding/intro
          */
         geocode: GoogleMapsClientEndpoint<GeocodeRequest, GeocodeResponse>;
-        
-        // geolocate: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * The Geolocation API returns a location and accuracy radius based on information about cell towers and WiFi nodes
+         * that the mobile client can detect. This document describes the protocol used to send this data to the server and
+         * to return a response to the client.
+         * 
+         * @see https://developers.google.com/maps/documentation/geolocation/intro
+         */
+        geolocate: GoogleMapsClientEndpoint<GeolocateRequest, GeolocateResponse>;
         // nearestRoads: GoogleMapsClientEndpoint<Request, Response>;
         // place: GoogleMapsClientEndpoint<Request, Response>;
         // places: GoogleMapsClientEndpoint<Request, Response>;
@@ -1457,7 +1463,7 @@ declare module '@google/maps' {
          * The bounding box of the viewport within which to bias geocode results more prominently.
          * This parameter will only influence, not fully restrict, results from the geocoder.
          */
-        bounds?: LatLngBounds;	
+        bounds?: LatLngBounds;
         /**
          * The language in which to return results.
          *  - If `language` is not supplied, the geocoder attempts to use the preferred language as specified in the `Accept-Language` header,
@@ -1728,5 +1734,133 @@ declare module '@google/maps' {
         global_code: string;
         /** is a 6 character or longer local code with an explicit location (CWC8+R9, Mountain View, CA, USA). */
         compound_code: string;
+    }
+
+    export interface GeolocateRequest {
+        /** The mobile country code (MCC) for the device's home network */
+        homeMobileCountryCode?: number;
+        /** The mobile network code (MNC) for the device's home network */
+        homeMobileNetworkCode?: number;
+        /** The mobile radio type. While this field is optional, it should be included if a value is available, for more accurate results */
+        radioType?: RadopType;
+        /** The carrier name */
+        carrier?: string;
+        /**
+         * Specifies whether to fall back to IP geolocation if wifi and cell tower signals are not available.
+         * Defaults to `true`. Set `considerIp` to `false` to disable fall back.
+         */
+        considerIp?: boolean;
+        /** An array of cell tower objects */
+        cellTowers?: CellTower[];
+        /** An array of WiFi access point objects */
+        wifiAccessPoints?: WifiAccessPoint[];
+    }
+
+    export enum RadopType {
+        lte = 'lte',
+        gsm = 'gsm',
+        cdma = 'cdma',
+        wcdma = 'wcdma',
+    }
+
+    export interface CellTower {
+        /**
+         * Unique identifier of the cell.
+         * On GSM, this is the Cell ID (CID);
+         * CDMA networks use the Base Station ID (BID).
+         * WCDMA networks use the UTRAN/GERAN Cell Identity (UC-Id), which is a 32-bit value concatenating the Radio Network Controller (RNC)
+         * and Cell ID. Specifying only the 16-bit Cell ID value in WCDMA networks may return inaccurate results.
+         */
+        cellId: number;
+        /** The Location Area Code (LAC) for GSM and WCDMA networks. The Network ID (NID) for CDMA networks */
+        locationAreaCode: number;
+        /** The cell tower's Mobile Country Code (MCC) */
+        mobileCountryCode: number;
+        /** The cell tower's Mobile Network Code. This is the MNC for GSM and WCDMA; CDMA uses the System ID (SID) */
+        mobileNetworkCode: number;
+        /** The number of milliseconds since this cell was primary. If age is 0, the `cellId` represents a current measurement */
+        age?: number;
+        /** Radio signal strength measured in dBm */
+        signalStrength?: number;
+        /** The [timing advance](https://en.wikipedia.org/wiki/Timing_advance) value */
+        timingAdvance?: number;
+    }
+
+    export interface WifiAccessPoint {
+        /** The MAC address of the WiFi node. It's typically called a BSS, BSSID or MAC address. Separators must be `:` (colon). */
+        macAddress: string;
+        /** The current signal strength measured in dBm. */
+        signalStrength?: number;
+        /** The number of milliseconds since this access point was detected. */
+        age?: number;
+        /** The channel over which the client is communicating with the acces */
+        channel?: number;
+        /** The current signal to noise ratio measured in dB. */
+        signalToNoiseRatio?: number;
+    }
+
+    export interface GeolocateResponse {
+        /** The user’s estimated latitude and longitude, in degrees. Contains one `lat` and one `lng` subfield */
+        location: LatLng;
+        /** The accuracy of the estimated location, in meters. This represents the radius of a circle around the given location. */
+        accuracy: number;
+    }
+
+    /**
+     * In the case of an error, a standard format error response body will be returned
+     * and the HTTP status code will be set to an error status.
+     */
+    export interface GeolocateError {
+        error: {
+            /** This is the same as the HTTP status of the response */
+            code: number;
+            /** A short description of the error */
+            message: string;
+            /**
+             * A list of errors which occurred. Each error contains an identifier for the type of error (the `reason`)
+             * and a short description (the `message`).
+             */
+            errors: {
+                domain: string;
+                reason: GeolocateErrorReason;
+                message: string;
+            }[];
+        }
+    }
+
+    export enum GeolocateErrorReason {
+        /**
+         * You have exceeded your daily limit.
+         * Domain: usageLimits
+         * Code: 403	
+         */
+        dailyLimitExceeded = 'dailyLimitExceeded',
+        /**
+         * Your API key is not valid for the Geolocation API. Please ensure that you've included the entire key,
+         * and that you've either purchased the API or have enabled billing and activated the API to obtain the free quota.
+         * Domain: usageLimits
+         * Code: 400	
+         */
+        keyInvalid = 'keyInvalid',
+        /**
+         * You have exceeded the requests per second per user limit that you configured in the Google Cloud Platform Console.
+         * This limit should be configured to prevent a single or small group of users from exhausting your daily quota,
+         * while still allowing reasonable access to all users.
+         * Domain: usageLimits
+         * Code: 403	
+         */
+        userRateLimitExceeded = 'userRateLimitExceeded',
+        /**
+         * The request was valid, but no results were returned.
+         * Domain: geolocation
+         * Code: 404	
+         */
+        notFound = 'notFound',
+        /**
+         * The request body is not valid JSON. Refer to the Request Body section for details on each field.
+         * Domain: global
+         * Code: 400	
+         */
+        parseError = 'parseError',
     }
 }
