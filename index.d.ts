@@ -270,14 +270,14 @@ declare module '@google/maps' {
          * The place ID may only be specified if the request includes an API key or a Google Maps APIs Premium Plan client ID.
          * Waypoints are only supported for driving, walking and bicycling directions.
          */
-        waypoints?: Array<LatLng>;
+        waypoints?: LatLng[];
         /**
          * If set to `true`, specifies that the Directions service may provide more than one route alternative in the response.
          * Note that providing route alternatives may increase the response time from the server.
          */
         alternatives?: boolean;
         /** Indicates that the calculated route(s) should avoid the indicated features */
-        avoid?: Array<TravelRestriction>;
+        avoid?: TravelRestriction[];
         /**
          * The language in which to return results.
          * 
@@ -331,7 +331,7 @@ declare module '@google/maps' {
          * This parameter may only be specified for transit directions, and only if the request includes an API key or
          * a Google Maps APIs Premium Plan client ID.
          */
-        transit_mode?: Array<TransitMode>;
+        transit_mode?: TransitMode[];
         /**
          * Specifies preferences for transit routes.
          * Using this parameter, you can bias the options returned, rather than accepting the default best route chosen by the API.
@@ -773,7 +773,7 @@ declare module '@google/maps' {
          */
         headway: number;
         /**
-         * contains the number of stops in this step, counting the arrival stop, but not the departure stop.\
+         * contains the number of stops in this step, counting the arrival stop, but not the departure stop.
          * For example, if your directions involve leaving from Stop A, passing through stops B and C, and arriving at stop D,
          * `num_stops` will return 3.
          */
@@ -972,14 +972,13 @@ declare module '@google/maps' {
          *      - Encoded polylines must be prefixed with `enc:` and followed by a colon (`:`). For example: `origins=enc:gfo}EtohhU:`
          *      - You can also include multiple encoded polylines, separated by the pipe character (`|`).
          *          For example: `origins=enc:wc~oAwquwMdlTxiKtqLyiK:|enc:c~vnAamswMvlTor@tjGi}L:|enc:udymA{~bxM:`
-
          */
-        origins: Array<LatLng>;
+        origins: LatLng[];
         /**
          * One or more locations to use as the finishing point for calculating travel distance and time.
          * The options for the destinations parameter are the same as for the origins parameter, described above.
          */
-        destinations: Array<LatLng>;
+        destinations: LatLng[];
         /**
          * Specifies the mode of transport to use when calculating distance.
          * Valid values and other request details are specified in the Travel Modes section of this document.
@@ -1013,7 +1012,7 @@ declare module '@google/maps' {
          * Introduces restrictions to the route. Valid values are specified in the Restrictions section of this document.
          * Only one restriction can be specified.
          */
-        avoid?: Array<TravelRestriction>;
+        avoid?: TravelRestriction[];
         /** Specifies the unit system to use when expressing distance as text */
         units?: UnitSystem;
         /**
@@ -1051,7 +1050,7 @@ declare module '@google/maps' {
          */
         traffic_model?: TrafficModel;
         /** Specifies one or more preferred modes of transit. This parameter may only be specified for requests where the `mode` is `transit` */
-        transit_mode?: Array<TransitMode>;
+        transit_mode?: TransitMode[];
         /**
          * Specifies preferences for transit requests. Using this parameter, you can bias the options returned,
          * rather than accepting the default best route chosen by the API.
@@ -1175,7 +1174,7 @@ declare module '@google/maps' {
          * This parameter takes either a single location as a comma-separated {latitude,longitude} pair (e.g. "40.714728,-73.998672")
          * or multiple latitude/longitude pairs passed as an array or as an encoded polyline.
          */
-        locations: Array<LatLng>;
+        locations: LatLng[];
     }
 
     export interface ElevationResponse {
@@ -1234,7 +1233,7 @@ declare module '@google/maps' {
          * defines a path on the earth for which to return elevation data.
          * This parameter defines a set of two or more ordered {latitude,longitude} pairs defining a path along the surface of the earth.
          */
-        path: Array<LatLng> | string;
+        path: LatLng[] | string;
         /**
          * specifies the number of sample points along a path for which to return elevation data.
          * The samples parameter divides the given path into an ordered set of equidistant points along the path.
@@ -1257,7 +1256,7 @@ declare module '@google/maps' {
          * 
          * **Note:** If you omit the fields parameter from a Find Place request, only the place_id for the result will be returned.
          */
-        fields?: Array<keyof SearchResponse>;
+        fields?: (keyof SearchResponse)[];
         /**
          * Prefer results in a specified area, by specifying either a radius plus lat/lng, or two lat/lng pairs representing
          * the points of a rectangle. If this parameter is not specified, the API uses IP address biasing by default.
