@@ -173,6 +173,8 @@ declare module '@google/maps' {
         ChineseTraditional = 'zh-TW',
     }
 
+    type GoogleMapsClientEndpoint<Request, Response> = (query: Request, callback?: ResponseCallback<Response>) => RequestHandle<Response>;
+
     export interface GoogleMapsClient {
         /**
          * The Directions API is a service that calculates directions between locations.
@@ -180,7 +182,7 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/directions/intro
          */
-        directions(query: DirectionsRequest, callback?: ResponseCallback<DirectionsResponse>): RequestHandle<DirectionsResponse>;
+        directions: GoogleMapsClientEndpoint<DirectionsRequest, DirectionsResponse>;
         /**
          * The Distance Matrix API is a service that provides travel distance and time for a matrix of origins and destinations.
          * The API returns information based on the recommended route between start and end points, as calculated by the Google Maps API,
@@ -188,7 +190,7 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/distance-matrix/intro
          */
-        distanceMatrix(query: DistanceMatrixRequest, callback?: ResponseCallback<DistanceMatrixResponse>): RequestHandle<DistanceMatrixResponse>;
+        distanceMatrix: GoogleMapsClientEndpoint<DistanceMatrixRequest, DistanceMatrixResponse>;
         /**
          * The Elevation API provides a simple interface to query locations on the earth for elevation data.
          * With the Elevation API, you can develop hiking and biking applications, positioning applications,
@@ -196,7 +198,7 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/elevation/intro
          */
-        elevation(query: ElevationRequest, callback?: ResponseCallback<ElevationResponse>): RequestHandle<ElevationResponse>;
+        elevation: GoogleMapsClientEndpoint<ElevationRequest, ElevationResponse>;
         /**
          * You may request sampled elevation data along paths, allowing you to calculate elevation changes along routes.
          * With the Elevation API, you can develop hiking and biking applications, positioning applications,
@@ -204,14 +206,14 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/elevation/intro
          */
-        elevationAlongPath(query: ElevationAlongPathRequest, callback?: ResponseCallback<ElevationResponse>): RequestHandle<ElevationResponse>;
+        elevationAlongPath: GoogleMapsClientEndpoint<ElevationAlongPathRequest, ElevationResponse>;
         /**
          * A Find Place request takes a text input, and returns a place.
          * The text input can be any kind of Places data, for example, a name, address, or phone number.
          * 
          * @see https://developers.google.com/places/web-service/search
          */
-        findPlace(query: FindPlaceRequest, callback?: ResponseCallback<SearchResponse>): RequestHandle<SearchResponse>;
+        findPlace: GoogleMapsClientEndpoint<FindPlaceRequest, SearchResponse>;
         /**
          * Geocoding is the process of converting addresses (like "1600 Amphitheatre Parkway, Mountain View, CA")
          * into geographic coordinates (like latitude 37.423021 and longitude -122.083739),
@@ -219,7 +221,22 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/geocoding/intro
          */
-        geocode(query: GeocodeRequest, callback?: ResponseCallback<GeocodeResponse>): RequestHandle<GeocodeResponse>;
+        geocode: GoogleMapsClientEndpoint<GeocodeRequest, GeocodeResponse>;
+        
+        // geolocate: GoogleMapsClientEndpoint<Request, Response>;
+        // nearestRoads: GoogleMapsClientEndpoint<Request, Response>;
+        // place: GoogleMapsClientEndpoint<Request, Response>;
+        // places: GoogleMapsClientEndpoint<Request, Response>;
+        // placesAutoComplete: GoogleMapsClientEndpoint<Request, Response>;
+        // placesNearby: GoogleMapsClientEndpoint<Request, Response>;
+        // placesPhoto: GoogleMapsClientEndpoint<Request, Response>;
+        // placesQueryAutoComplete: GoogleMapsClientEndpoint<Request, Response>;
+        // placesRadar: GoogleMapsClientEndpoint<Request, Response>;
+        // reverseGeocode: GoogleMapsClientEndpoint<Request, Response>;
+        // snappedSpeedLimits: GoogleMapsClientEndpoint<Request, Response>;
+        // snapToRoads: GoogleMapsClientEndpoint<Request, Response>;
+        // speedLimits: GoogleMapsClientEndpoint<Request, Response>;
+        // timezone: GoogleMapsClientEndpoint<Request, Response>;
     }
 
     export interface DirectionsRequest {
@@ -1349,14 +1366,24 @@ declare module '@google/maps' {
          * You can only retrieve app-scoped places via the Nearby Search and the Place Details requests.
          * If the `scope` field is not present in a response, it is safe to assume the scope is `GOOGLE`.
          */
-        scope: PlaceScope;
+        scope: PlaceIdScope;
         /**
          * An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
          * Note: This array may be empty or not present.
          */
         alt_ids: string[];
-        /** The price level of the place, on a scale of 0 to 4. The exact amount indicated by a specific value will vary from region to region */
-        price_level: PriceLevel;
+        /**
+         * The price level of the place, on a scale of 0 to 4.
+         * The exact amount indicated by a specific value will vary from region to region.
+         * 
+         * Price levels are interpreted as follows:
+         *  - `0`: Free
+         *  - `1`: Inexpensive
+         *  - `2`: Moderate
+         *  - `3`: Expensive
+         *  - `4`: Very Expensive
+         */
+        price_level: number;
         /** contains the place's rating, from 1.0 to 5.0, based on aggregated user reviews */
         rating: number;
         /**
@@ -1398,7 +1425,7 @@ declare module '@google/maps' {
         html_attributions: string[];
     }
 
-    export enum PlaceScope {
+    export enum PlaceIdScope {
         /**
          * The place ID is recognised by your application only.
          * This is because your application added the place, and the place has not yet passed the moderation process.
@@ -1406,14 +1433,6 @@ declare module '@google/maps' {
         APP = 'APP',
         /** The place ID is available to other applications and on Google Maps */
         GOOGLE = 'GOOGLE',
-    }
-
-    export enum PriceLevel {
-        Free = 0,
-        Inexpensive = 1,
-        Moderate = 2,
-        Expensive = 3,
-        VeryExpensive = 4,
     }
 
     export interface AlternativePlaceId {
@@ -1426,7 +1445,7 @@ declare module '@google/maps' {
          * The scope of an alternative place ID will always be `APP`,
          * indicating that the alternative place ID is recognised by your application only.
          */
-        scope: PlaceScope.APP;
+        scope: PlaceIdScope.APP;
     }
 
     export interface GeocodeRequest {
