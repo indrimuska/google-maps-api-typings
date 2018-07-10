@@ -230,7 +230,13 @@ declare module '@google/maps' {
          * @see https://developers.google.com/maps/documentation/geolocation/intro
          */
         geolocate: GoogleMapsClientEndpoint<GeolocateRequest, GeolocateResponse>;
-        // nearestRoads: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * The Roads API takes up to 100 independent coordinates, and returns the closest road segment for each point.
+         * The points passed do not need to be part of a continuous path.
+         * 
+         * @see https://developers.google.com/maps/documentation/roads/nearest
+         */
+        nearestRoads: GoogleMapsClientEndpoint<NearestRoadsRequest, NearestRoadsResponse>;
         // place: GoogleMapsClientEndpoint<Request, Response>;
         // places: GoogleMapsClientEndpoint<Request, Response>;
         // placesAutoComplete: GoogleMapsClientEndpoint<Request, Response>;
@@ -1862,5 +1868,37 @@ declare module '@google/maps' {
          * Code: 400	
          */
         parseError = 'parseError',
+    }
+
+    export interface NearestRoadsRequest {
+        /**
+         * A list of latitude/longitude pairs. Latitude and longitude values should be separated by commas.
+         * Coordinates should be separated by the pipe character: "|".
+         * For example: `points=60.170880,24.942795|60.170879,24.942796|60.170877,24.942796`.
+         */
+        points: LatLng[];
+    }
+
+    export interface NearestRoadsResponse {
+        /** An array of snapped points */
+        snappedPoints: {
+            /** Contains a `latitude` and `longitude` value */
+            location: LatLng;
+            /**
+             * An integer that indicates the corresponding value in the original request. Each point in the request maps to at most two segments in the response:
+             *  - If there are no nearby roads, no segment is returned.
+             *  - If the nearest road is one-way, one segment is returned.
+             *  - If the nearest road is bidirectional, two segments are returned.
+             */
+            originalIndex: number;
+            /**
+             * A unique identifier for a place. All place IDs returned by the Roads API correspond to road segments.
+             * Place IDs can be used with other Google APIs, including the Places SDK and the Maps JavaScript API.
+             * For example, if you need to get road names for the snapped points returned by the Roads API,
+             * you can pass the `placeId` to the Places SDK or the Geocoding API. Within the Roads API,
+             * you can pass the `placeId` in a speed limits request to determine the speed limit along that road segment.
+             */
+            placeId: string;
+        }[];
     }
 }
