@@ -278,9 +278,15 @@ declare module '@google/maps' {
          */
         placesNearby: GoogleMapsClientEndpoint<PlacesNearbyRequest, PlaceSearchResponse>;
         /**
+         * The Place Photo service, part of the Places API, is a read- only API that allows you to add high quality photographic content
+         * to your application. The Place Photo service gives you access to the millions of photos stored in the Places database.
+         * When you get place information using a Place Details request, photo references will be returned for relevant photographic content.
+         * The Nearby Search and Text Search requests also return a single photo reference per place, when relevant.
+         * Using the Photo service you can then access the referenced photos and resize the image to the optimal size for your application.
+         * 
          * @see https://developers.google.com/places/web-service/photos
          */
-        // placesPhoto: GoogleMapsClientEndpoint<Request, Response>;
+        placesPhoto: GoogleMapsClientEndpoint<PlacePhotoRequest, PlacePhotoResponse>;
         /**
          * @see https://developers.google.com/places/web-service/query
          */
@@ -2595,4 +2601,40 @@ declare module '@google/maps' {
          */
         Distance = 'distance',
     }
+
+    export interface PlacePhotoRequest {
+        /**
+         * string identifier that uniquely identifies a photo.
+         * Photo references are returned from either a Place Search or Place Details request.
+         */
+        photoreference: string;
+        /**
+         * Specifies the maximum desired height or width, in pixels, of the image returned by the Place Photos service.
+         * If the image is smaller than the values specified, the original image will be returned.
+         * If the image is larger in either dimension, it will be scaled to match the smaller of the two dimensions,
+         * restricted to its original aspect ratio. Both the `maxheight` and `maxwidth` properties accept an integer between 1 and 1600.
+         */
+        maxwidth?: number;
+        /**
+         * Specifies the maximum desired height or width, in pixels, of the image returned by the Place Photos service.
+         * If the image is smaller than the values specified, the original image will be returned.
+         * If the image is larger in either dimension, it will be scaled to match the smaller of the two dimensions,
+         * restricted to its original aspect ratio. Both the `maxheight` and `maxwidth` properties accept an integer between 1 and 1600.
+         */
+        maxheight?: number;
+    }
+
+    /**
+     * The response of a successful Place Photo request will be an image.
+     * The type of the image will depend upon the type of the originally submitted photo.
+     * 
+     * If your request exceeds your available quota, the server will return an HTTP 403 status to indicate that the quota has been exceeded.
+     * 
+     * If the server is unable to understand your request, it will return HTTP 400 status, which indicates an invalid request.
+     * 
+     * The most common reasons why you might see an invalid request include:
+     *  - The submitted photo reference was incorrectly specified.
+     *  - Your request did not include either a `maxwidth` or `maxheight` parameter.
+     */
+    export type PlacePhotoResponse = string;
 }
