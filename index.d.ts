@@ -3,19 +3,19 @@ declare module '@google/maps' {
      * Creates a Google Maps client. The client object contains all the API methods.
      */
     export interface CreateClientOptions {
-        /** API key (required, unless clientID and clientSecret provided). */
+        /** API key (required, unless clientID and clientSecret provided) */
         key: string;
-        /** Maps API for Work client ID. */
+        /** Maps API for Work client ID */
         clientId?: string;
-        /** Maps API for Work client secret (a.k.a. private key). */
+        /** Maps API for Work client secret (a.k.a. private key) */
         clientSecret?: string;
-        /** Maps API for Work channel. */
+        /** Maps API for Work channel */
         channel?: string;
-        /** Timeout in milliseconds. (Default: 60 * 1000 ms). */
+        /** Timeout in milliseconds. (Default: 60 * 1000 ms) */
         timeout?: number;
-        /** Default language for all queries. */
+        /** Default language for all queries */
         language?: Language;
-        /** Promise constructor (optional). */
+        /** Promise constructor (optional) */
         Promise?: PromiseConstructor;
         /** Rate options */
         rate?: RateOptions;
@@ -56,15 +56,15 @@ declare module '@google/maps' {
      * The object given to the ResponseCallback, containing the HTTP status and headers, as well as the response JSON.
      */
     export interface ClientResponse<T> {
-        /** The HTTP headers. */
+        /** The HTTP headers */
         headers: { [index: string]: string };
-        /** Deserialized JSON object for the API response. */
+        /** Deserialized JSON object for the API response */
         json: T;
-        /** The HTTP status. */
+        /** The HTTP status */
         status: number;
     }
 
-    /** A handle that allows cancelling a request, or obtaining a Promise. */
+    /** A handle that allows cancelling a request, or obtaining a Promise */
     export interface RequestHandle<T> {
         /**
          * Returns the response as a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
@@ -237,7 +237,10 @@ declare module '@google/maps' {
          * @see https://developers.google.com/maps/documentation/roads/nearest
          */
         nearestRoads: GoogleMapsClientEndpoint<NearestRoadsRequest, NearestRoadsResponse>;
-        // place: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * 
+         */
+        place: GoogleMapsClientEndpoint<PlaceDetailsRequest, PlaceDetailsResponse>;
         // places: GoogleMapsClientEndpoint<Request, Response>;
         // placesAutoComplete: GoogleMapsClientEndpoint<Request, Response>;
         // placesNearby: GoogleMapsClientEndpoint<Request, Response>;
@@ -363,11 +366,11 @@ declare module '@google/maps' {
      * so these directions will return warnings in the returned result which you must display to the user.
      */
     export enum TravelMode {
-        /** (default) indicates standard driving directions using the road network. */
+        /** (default) indicates standard driving directions using the road network */
         Driving = 'driving',
-        /** requests walking directions via pedestrian paths & sidewalks (where available). */
+        /** requests walking directions via pedestrian paths & sidewalks (where available) */
         Walking = 'walking',
-        /** requests bicycling directions via bicycle paths & preferred streets (where available). */
+        /** requests bicycling directions via bicycle paths & preferred streets (where available) */
         Bicycling = 'bicycling',
         /**
          * requests directions via public transit routes (where available).
@@ -379,11 +382,11 @@ declare module '@google/maps' {
     }
 
     export enum TravelRestriction {
-        /** indicates that the calculated route should avoid toll roads/bridges. */
+        /** indicates that the calculated route should avoid toll roads/bridges */
         tolls = 'tolls',
-        /** indicates that the calculated route should avoid highways. */
+        /** indicates that the calculated route should avoid highways */
         highways = 'highways',
-        /** indicates that the calculated route should avoid ferries. */
+        /** indicates that the calculated route should avoid ferries */
         ferries = 'ferries',
         /**
          * indicates that the calculated route should avoid indoor steps for walking and transit directions.
@@ -464,11 +467,11 @@ declare module '@google/maps' {
      * to help you track down why the Directions service failed.
      */
     export enum DirectionsReponseStatus {
-        /** indicates the response contains a valid `result`. */
+        /** indicates the response contains a valid `result` */
         OK = 'OK',
-        /** indicates at least one of the locations specified in the request's origin, destination, or waypoints could not be geocoded. */
+        /** indicates at least one of the locations specified in the request's origin, destination, or waypoints could not be geocoded */
         NOT_FOUND = 'NOT_FOUND',
-        /** indicates no route could be found between the origin and destination. */
+        /** indicates no route could be found between the origin and destination */
         ZERO_RESULTS = 'ZERO_RESULTS',
         /**
          * indicates that too many `waypoints` were provided in the request. For applications using the Directions API as a web service,
@@ -482,7 +485,7 @@ declare module '@google/maps' {
          * Try reducing the number of waypoints, turns, or instructions.
          */
         MAX_ROUTE_LENGTH_EXCEEDED = 'MAX_ROUTE_LENGTH_EXCEEDED ',
-        /** indicates that the provided request was invalid. Common causes of this status include an invalid parameter or parameter value. */
+        /** indicates that the provided request was invalid. Common causes of this status include an invalid parameter or parameter value */
         INVALID_REQUEST = 'INVALID_REQUEST',
         /**
          * indicates any of the following:
@@ -493,11 +496,11 @@ declare module '@google/maps' {
          * See the [Maps FAQ](https://developers.google.com/maps/faq#over-limit-key-error) to learn how to fix this.
          */
         OVER_DAILY_LIMIT = 'OVER_DAILY_LIMIT',
-        /** indicates the service has received too many requests from your application within the allowed time period. */
+        /** indicates the service has received too many requests from your application within the allowed time period */
         OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
-        /** indicates that the service denied use of the directions service by your application. */
+        /** indicates that the service denied use of the directions service by your application */
         REQUEST_DENIED = 'REQUEST_DENIED',
-        /** indicates a directions request could not be processed due to a server error. The request may succeed if you try again. */
+        /** indicates a directions request could not be processed due to a server error. The request may succeed if you try again */
         UNKNOWN_ERROR = 'UNKNOWN_ERROR',
     }
 
@@ -519,7 +522,7 @@ declare module '@google/maps' {
          * Suggestions triggered in this way will also be marked as a partial match.
          */
         partial_match: boolean;
-        /** unique identifier that can be used with other Google APIs. */
+        /** unique identifier that can be used with other Google APIs */
         place_id: string;
         /**
          * indicates the *address* type of the geocoding result used for calculating directions.
@@ -529,9 +532,9 @@ declare module '@google/maps' {
     }
 
     export enum DirectionsGeocodedWaypointStatus {
-        /** indicates that no errors occurred; the address was successfully parsed and at least one geocode was returned. */
+        /** indicates that no errors occurred; the address was successfully parsed and at least one geocode was returned */
         OK = 'OK',
-        /** indicates that the geocode was successful but returned no results. This may occur if the geocoder was passed a non-existent `address`. */
+        /** indicates that the geocode was successful but returned no results. This may occur if the geocoder was passed a non-existent `address` */
         ZERO_RESULTS = 'ZERO_RESULTS',
     }
 
@@ -540,7 +543,7 @@ declare module '@google/maps' {
      * As well, the route also contains copyright and warning information which must be displayed to the user in addition to the routing information.
      */
     export interface DirectionsRoute {
-        /** contains a short textual description for the route, suitable for naming and disambiguating the route from alternatives. */
+        /** contains a short textual description for the route, suitable for naming and disambiguating the route from alternatives */
         summary: string;
         /**
          * contains an array which contains information about a leg of the route, between two locations within the given route.
@@ -572,11 +575,11 @@ declare module '@google/maps' {
          * This polyline is an approximate (smoothed) path of the resulting directions.
          */
         overview_polyline: string;
-        /** contains the viewport bounding box of the `overview_polyline`. */
+        /** contains the viewport bounding box of the `overview_polyline` */
         bounds: LatLngBounds;
-        /** contains the copyrights text to be displayed for this route. You must handle and display this information yourself. */
+        /** contains the copyrights text to be displayed for this route. You must handle and display this information yourself */
         copyrights: string;
-        /** contains an array of warnings to be displayed when showing these directions. You must handle and display these warnings yourself. */
+        /** contains an array of warnings to be displayed when showing these directions. You must handle and display these warnings yourself */
         warnings: string[];
         /**
          * If present, contains the total fare (that is, the total ticket costs) on this route.
@@ -595,9 +598,9 @@ declare module '@google/maps' {
     export interface TransitFare {
         /** An [ISO 4217 currency code](https://en.wikipedia.org/wiki/ISO_4217) indicating the currency that the amount is expressed in */
         currency: string;
-        /** The total fare amount, in the currency specified above. */
+        /** The total fare amount, in the currency specified above */
         value: number;
-        /** The total fare amount, formatted in the requested language. */
+        /** The total fare amount, formatted in the requested language */
         text: string;
     }
 
@@ -636,7 +639,7 @@ declare module '@google/maps' {
          *  - Traffic conditions are available for the requested route.
          */
         duration_in_traffic: Duration;
-        /** contains the estimated time of arrival for this leg. This property is only returned for transit directions. */
+        /** contains the estimated time of arrival for this leg. This property is only returned for transit directions */
         arrival_time: Time;
         /**
          * contains the estimated time of departure for this leg, specified as a `Time` object.
@@ -728,9 +731,9 @@ declare module '@google/maps' {
     }
 
     export interface Time {
-        /** the time specified as a JavaScript `Date` object. */
+        /** the time specified as a JavaScript `Date` object */
         value: Date;
-        /** the time specified as a string. The time is displayed in the time zone of the transit stop. */
+        /** the time specified as a string. The time is displayed in the time zone of the transit stop */
         text: string;
         /**
          * contains the time zone of this station. The value is the name of the time zone as defined in the
@@ -823,7 +826,7 @@ declare module '@google/maps' {
         vehicle: TransitVehicle;
     }
 
-    /** You must display the names and URLs of the transit agencies servicing the trip results. */
+    /** You must display the names and URLs of the transit agencies servicing the trip results */
     export interface TransitAgency {
         /** contains the name of the transit agency */
         name: string;
@@ -886,15 +889,15 @@ declare module '@google/maps' {
     }
 
     export enum AddressType {
-        /** indicates a precise street address. */
+        /** indicates a precise street address */
         street_address = 'street_address',
-        /** indicates a named route (such as "US 101"). */
+        /** indicates a named route (such as "US 101") */
         route = 'route',
-        /** indicates a major intersection, usually of two major roads. */
+        /** indicates a major intersection, usually of two major roads */
         intersection = 'intersection',
-        /** indicates a political entity. Usually, this type indicates a polygon of some civil administration. */
+        /** indicates a political entity. Usually, this type indicates a polygon of some civil administration */
         political = 'political',
-        /** indicates the national political entity, and is typically the highest order type returned by the Geocoder. */
+        /** indicates the national political entity, and is typically the highest order type returned by the Geocoder */
         country = 'country',
         /**
          * indicates a first-order civil entity below the country level. Within the United States, these administrative levels are states.
@@ -923,9 +926,9 @@ declare module '@google/maps' {
          * This type indicates a minor civil division. Not all nations exhibit these administrative levels.
          */
         administrative_area_level_5 = 'administrative_area_level_5',
-        /** indicates a commonly-used alternative name for the entity. */
+        /** indicates a commonly-used alternative name for the entity */
         colloquial_area = 'colloquial_area',
-        /** indicates an incorporated city or town political entity. */
+        /** indicates an incorporated city or town political entity */
         locality = 'locality',
         /**
          * indicates a specific type of Japanese locality,
@@ -948,13 +951,13 @@ declare module '@google/maps' {
          * a collection of buildings with a common name
          */
         subpremise = 'subpremise',
-        /** indicates a postal code as used to address postal mail within the country. */
+        /** indicates a postal code as used to address postal mail within the country */
         postal_code = 'postal_code',
-        /** indicates a prominent natural feature. */
+        /** indicates a prominent natural feature */
         natural_feature = 'natural_feature',
-        /** indicates an airport. */
+        /** indicates an airport */
         airport = 'airport',
-        /** indicates a named park. */
+        /** indicates a named park */
         park = 'park',
         /**
          * indicates a named point of interest. Typically, these "POI"s are prominent local entities that don't easily fit in another category,
@@ -1072,7 +1075,7 @@ declare module '@google/maps' {
     }
 
     export interface DistanceMatrixResponse {
-        /** contains metadata on the request. See Status Codes below. */
+        /** contains metadata on the request. See Status Codes below */
         status: DistanceMatrixResponseTopLevelStatus;
         /**
          * When the top-level status code is other than `OK`, this field contains more detailed information
@@ -1382,7 +1385,7 @@ declare module '@google/maps' {
          * An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
          * Note: This array may be empty or not present.
          */
-        alt_ids: string[];
+        alt_ids: AlternativePlaceId[];
         /**
          * The price level of the place, on a scale of 0 to 4.
          * The exact amount indicated by a specific value will vary from region to region.
@@ -1423,6 +1426,33 @@ declare module '@google/maps' {
     export interface OpeningHours {
         /** is a boolean value indicating if the place is open at the current time */
         open_now: boolean;
+        /** is an array of opening periods covering seven days, starting from Sunday, in chronological order */
+        periods: OpeningPeriod[];
+    }
+
+    export interface OpeningPeriod {
+        /** contains a pair of day and time objects describing when the place opens */
+        open: OpeningHoursTime;
+        /**
+         * may contain a pair of day and time objects describing when the place closes.
+         * **Note:** If a place is **always open**, the `close` section will be missing from the response.
+         * Clients can rely on always-open being represented as an `open` period containing `day` with value 0
+         * and `time` with value 0000, and no `close`. */
+        close?: OpeningHoursTime;
+        /**
+         * is an array of seven strings representing the formatted opening hours for each day of the week.
+         * If a `language` parameter was specified in the Place Details request, the Places Service will format
+         * and localize the opening hours appropriately for that language. The ordering of the elements in this array
+         * depends on the `language` parameter. Some languages start the week on Monday while others start on Sunday.
+         */
+        weekday_text: string[];
+    }
+
+    export interface OpeningHoursTime {
+        /** a number from 0–6, corresponding to the days of the week, starting on Sunday. For example, 2 means Tuesday */
+        day: number;
+        /** may contain a time of day in 24-hour hhmm format. Values are in the range 0000–2359. The `time` will be reported in the place's time zone */
+        time?: string;
     }
 
     export interface PlacePhoto {
@@ -1696,9 +1726,9 @@ declare module '@google/maps' {
     }
 
     export interface AddressGeometry {
-        /** contains the geocoded latitude, longitude value. For normal address lookups, this field is typically the most important. */
+        /** contains the geocoded latitude, longitude value. For normal address lookups, this field is typically the most important */
         location: LatLng;
-        /** stores additional data about the specified location. */
+        /** stores additional data about the specified location */
         location_type: LocationType;
         /**
          * contains the recommended viewport for displaying the returned result, specified as two latitude, longitude values
@@ -1736,9 +1766,9 @@ declare module '@google/maps' {
     }
 
     export interface PlusCode {
-        /** is a 4 character area code and 6 character or longer local code (849VCWC8+R9). */
+        /** is a 4 character area code and 6 character or longer local code (849VCWC8+R9) */
         global_code: string;
-        /** is a 6 character or longer local code with an explicit location (CWC8+R9, Mountain View, CA, USA). */
+        /** is a 6 character or longer local code with an explicit location (CWC8+R9, Mountain View, CA, USA) */
         compound_code: string;
     }
 
@@ -1793,22 +1823,22 @@ declare module '@google/maps' {
     }
 
     export interface WifiAccessPoint {
-        /** The MAC address of the WiFi node. It's typically called a BSS, BSSID or MAC address. Separators must be `:` (colon). */
+        /** The MAC address of the WiFi node. It's typically called a BSS, BSSID or MAC address. Separators must be `:` (colon) */
         macAddress: string;
-        /** The current signal strength measured in dBm. */
+        /** The current signal strength measured in dBm */
         signalStrength?: number;
-        /** The number of milliseconds since this access point was detected. */
+        /** The number of milliseconds since this access point was detected */
         age?: number;
         /** The channel over which the client is communicating with the acces */
         channel?: number;
-        /** The current signal to noise ratio measured in dB. */
+        /** The current signal to noise ratio measured in dB */
         signalToNoiseRatio?: number;
     }
 
     export interface GeolocateResponse {
-        /** The user’s estimated latitude and longitude, in degrees. Contains one `lat` and one `lng` subfield */
+        /** The user's estimated latitude and longitude, in degrees. Contains one `lat` and one `lng` subfield */
         location: LatLng;
-        /** The accuracy of the estimated location, in meters. This represents the radius of a circle around the given location. */
+        /** The accuracy of the estimated location, in meters. This represents the radius of a circle around the given location */
         accuracy: number;
     }
 
@@ -1900,5 +1930,275 @@ declare module '@google/maps' {
              */
             placeId: string;
         }[];
+    }
+
+    export interface PlaceDetailsRequest {
+        /** A textual identifier that uniquely identifies a place, returned from a Place Search */
+        placeid: string;
+        /**
+         * The language code, indicating in which language the results should be returned, if possible.
+         * Note that some fields may not be available in the requested language.
+         * Note that we often update supported languages so this list may not be exhaustive.
+         */
+        language?: Language;
+        /**
+         * The region code, specified as a ccTLD (country code top-level domain) two-character value.
+         * Most ccTLD codes are identical to ISO 3166-1 codes, with some exceptions.
+         * This parameter will only influence, not fully restrict, results.
+         * If more relevant results exist outside of the specified region, they may be included.
+         * When this parameter is used, the country name is omitted from the resulting `formatted_address`
+         * for results in the specified region.
+         */
+        region?: string;
+        /**
+         * A random string which identifies an autocomplete session for billing purposes.
+         * Use this for Place Details requests that are called following an autocomplete request in the same user session
+         */
+        sessiontoken?: string;
+        /**
+         * One or more fields, specifying the types of place data to return, separated by a comma.
+         * 
+         * **Warning: If you do not specify at least one field with a request, or if you omit the **fields**
+         * parameter from a request, ALL possible fields will be returned, and you will be billed accordingly.
+         * This applies only to Place Details requests.
+         */
+        fields?: (keyof PlaceDetailsResult)[];
+    }
+
+    export interface PlaceDetailsResponse {
+        /** contains metadata on the request */
+        status: PlaceDetailsResponseStatus;
+        /**
+         * When the Google Places service returns a status code other than `OK`, there may be an additional `error_message` field
+         * within the details response object. This field contains more detailed information about the reasons behind the given status code.
+         */
+        /** contains the detailed information about the place requested */
+        result: PlaceDetailsResult;
+        /** contains a set of attributions about this listing which must be displayed to the user */
+        html_attributions: string[];
+    }
+
+    /**
+     * The `"status"` field within the place response object contains the status of the request,
+     * and may contain debugging information to help you track down why the place request failed
+     */
+    export enum PlaceDetailsResponseStatus {
+        /** indicates that no errors occurred; the place was successfully detected and at least one result was returned */
+        OK = 'OK',
+        /** indicates a server-side error; trying again may be successful */
+        UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+        /**
+         * indicates that the referenced location (placeid) was valid but no longer refers to a valid result.
+         * This may occur if the establishment is no longer in business.
+         */
+        ZERO_RESULTS = 'ZERO_RESULTS',
+        /**
+         * indicates any of the following:
+         *  - You have exceeded the QPS limits.
+         *  - The request is missing an API key.
+         *  - Billing has not been enabled on your account.
+         *  - The monthly $200 credit, or a self-imposed usage cap, has been exceeded.
+         *  - The provided method of payment is no longer valid (for example, a credit card has expired).
+         * See the [Maps FAQ](https://developers.google.com/maps/faq#over-limit-key-error) for more information
+         * about how to resolve this error.
+         */
+        OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+        /** indicates that your request was denied, generally because an invalid key parameter */
+        REQUEST_DENIED = 'REQUEST_DENIED',
+        /** generally indicates that the query (placeid) is missing */
+        INVALID_REQUEST = 'INVALID_REQUEST',
+        /** indicates that the referenced location (placeid) was not found in the Places database */
+        NOT_FOUND = 'NOT_FOUND',
+    }
+
+    /** When the Places service returns results from a details request, it places them within a single `result` */
+    export interface PlaceDetailsResult {
+        /**
+         * is an array containing the separate components applicable to this address.
+         * 
+         * Note the following facts about the `address_components[]` array:
+         *  - The array of address components may contain more components than the `formatted_address`.
+         *  - The array does not necessarily include all the political entities that contain an address,
+         *      apart from those included in the `formatted_address`. To retrieve all the political entities
+         *      that contain a specific address, you should use reverse geocoding, passing the latitude/longitude
+         *      of the address as a parameter to the request.
+         *  - The format of the response is not guaranteed to remain the same between requests.
+         *      In particular, the number of `address_components` varies based on the address requested
+         *      and can change over time for the same address. A component can change position in the array.
+         * .    The type of the component can change. A particular component may be missing in a later response.
+         */
+        address_components: AddressComponent[];
+        /**
+         * is a string containing the human-readable address of this place.
+         * 
+         * Often this address is equivalent to the postal address. Note that some countries, such as the United Kingdom,
+         * do not allow distribution of true postal addresses due to licensing restrictions.
+         * 
+         * The formatted address is logically composed of one or more address components.
+         * For example, the address "111 8th Avenue, New York, NY" consists of the following components: "111"
+         * (the street number), "8th Avenue" (the route), "New York" (the city) and "NY" (the US state).
+         * 
+         * Do not parse the formatted address programmatically. Instead you should use the individual address components,
+         * which the API response includes in addition to the formatted address field.
+         */
+        formatted_address: string;
+        /**
+         * contains the place's phone number in its local format.
+         * For example, the `formatted_phone_number` for Google's Sydney, Australia office is `(02) 9374 4000`.
+         */
+        formatted_phone_number: string;
+        /** is a representation of the place's address in the [adr microformat](http://microformats.org/wiki/adr) */
+        adr_address: string;
+        /**
+         * contains the following information:
+         *  - `location`: contains the geocoded latitude,longitude value for this place.
+         *  - `viewport`: contains the preferred viewport when displaying this place on a map as a `LatLngBounds` if it is known.
+         */
+        geometry: AddressGeometry;
+        /**
+         * is an encoded location reference, derived from latitude and longitude coordinates, that represents an area:
+         * 1/8000th of a degree by 1/8000th of a degree (about 14m x 14m at the equator) or smaller.
+         * Plus codes can be used as a replacement for street addresses in places where they do not exist
+         * (where buildings are not numbered or streets are not named).
+         * 
+         * The plus code is formatted as a global code and a compound code:
+         *  - `global_code` is a 4 character area code and 6 character or longer local code (849VCWC8+R9).
+         *  - `compound_code` is a 6 character or longer local code with an explicit location (CWC8+R9, Mountain View, CA, USA).
+         * 
+         * Typically, both the global code and compound code are returned.
+         * However, if the result is in a remote location (for example, an ocean or desert) only the global code may be returned.
+         * 
+         * @see [Open Location Code](https://en.wikipedia.org/wiki/Open_Location_Code)
+         * @see [plus codes](https://plus.codes/)
+         */
+        plus_code: PlusCode;
+        /** contains the URL of a suggested icon which may be displayed to the user when indicating this result on a map */
+        icon: string;
+        /**
+         * contains the place's phone number in international format.
+         * International format includes the country code, and is prefixed with the plus (+) sign.
+         * For example, the `international_phone_number` for Google's Sydney, Australia office is `+61 2 9374 4000`.
+         */
+        international_phone_number: string;
+        /**
+         * contains the human-readable name for the returned result.
+         * For establishment results, this is usually the canonicalized business name.
+         */
+        name: string;
+        /** place opening hours */
+        opening_hours: OpeningHours;
+        /**
+         * is a boolean flag indicating whether the place has permanently shut down (value `true`).
+         * If the place is not permanently closed, the flag is absent from the response.
+         */
+        permanently_closed: boolean;
+        /**
+         * an array of photo objects, each containing a reference to an image.
+         * A Place Details request may return up to ten photos.
+         * More information about place photos and how you can use the images in your application can be found in the Place Photos documentation.
+         */
+        photos: PlacePhoto[];
+        /**
+         * A textual identifier that uniquely identifies a place.
+         * To retrieve information about the place, pass this identifier in the `placeId` field of a Places API request.
+         */
+        place_id: string;
+        /** Indicates the scope of the `place_id` */
+        scope: PlaceIdScope;
+        /**
+         * An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
+         * Note: This array may be empty or not present.
+         */
+        alt_ids: AlternativePlaceId[];
+        /**
+         * The price level of the place, on a scale of 0 to 4.
+         * The exact amount indicated by a specific value will vary from region to region.
+         * 
+         * Price levels are interpreted as follows:
+         *  - `0`: Free
+         *  - `1`: Inexpensive
+         *  - `2`: Moderate
+         *  - `3`: Expensive
+         *  - `4`: Very Expensive
+         */
+        price_level: number;
+        /** contains the place's rating, from 1.0 to 5.0, based on aggregated user reviews */
+        rating: number;
+        /**
+         * a JSON array of up to five reviews. If a `language` parameter was specified in the Place Details request,
+         * the Places Service will bias the results to prefer reviews written in that language.
+         */
+        reviews: any[];
+    }
+
+    export interface PlaceReview {
+        /**
+         * contains a collection of `AspectRating` objects, each of which provides a rating of a single attribute of the establishment.
+         * The first object in the collection is considered the primary aspect.
+         */
+        aspects: AspectRating[];
+        /** the name of the user who submitted the review. Anonymous reviews are attributed to "A Google user" */
+        author_name: string;
+        /** the URL to the user's Google Maps Local Guides profile, if available */
+        author_url?: string;
+        /**
+         * an IETF language code indicating the language used in the user's review.
+         * This field contains the main language tag only, and not the secondary tag indicating country or region.
+         * For example, all the English reviews are tagged as 'en', and not 'en-AU' or 'en-UK' and so on.
+         */
+        language: string;
+        /** the user's overall rating for this place. This is a whole number, ranging from 1 to 5 */
+        rating: number;
+        /**
+         * the user's review. When reviewing a location with Google Places, text reviews are considered optional.
+         * Therefore, this field may by empty. Note that this field may include simple HTML markup.
+         * For example, the entity reference `&amp;` may represent an ampersand character.
+         */
+        text: string;
+        /** the time that the review was submitted, measured in the number of seconds since since midnight, January 1, 1970 UTC */
+        time: string;
+        /**
+         * contains an array of feature types describing the given result.
+         * XML responses include multiple `<type>` elements if more than one type is assigned to the result.
+         */
+        types: AddressType[];
+        /**
+         * contains the URL of the official Google page for this place.
+         * This will be the Google-owned page that contains the best available information about the place.
+         * Applications must link to or embed this page on any screen that shows detailed results about the place to the user.
+         */
+        url: string;
+        /**
+         * contains the number of minutes this place’s current timezone is offset from UTC.
+         * For example, for places in Sydney, Australia during daylight saving time this would be 660 (+11 hours from UTC),
+         * and for places in California outside of daylight saving time this would be -480 (-8 hours from UTC).
+         */
+        utc_offset: number;
+        /**
+         * lists a simplified address for the place, including the street name, street number, and locality,
+         * but not the province/state, postal code, or country. For example, Google's Sydney, Australia office
+         * has a `vicinity` value of `48 Pirrama Road, Pyrmont`.
+         */
+        vicinity: number;
+        /** lists the authoritative website for this place, such as a business' homepage. */
+        website: string;
+    }
+
+    export interface AspectRating {
+        /** the name of the aspect that is being rated */
+        type: AspectRatingType;
+        /** the user's rating for this particular aspect, from 0 to 3 */
+        rating: number;
+    }
+
+    export enum AspectRatingType {
+        Appeal = 'appeal',
+        Atmosphere = 'atmosphere',
+        Decor = 'decor',
+        Facilities = 'facilities',
+        Food = 'food',
+        Overall = 'overall',
+        Quality = 'quality',
+        Service = 'service',
     }
 }
