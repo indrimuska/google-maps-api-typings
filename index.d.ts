@@ -211,9 +211,9 @@ declare module '@google/maps' {
          * A Find Place request takes a text input, and returns a place.
          * The text input can be any kind of Places data, for example, a name, address, or phone number.
          * 
-         * @see https://developers.google.com/places/web-service/search
+         * @see https://developers.google.com/places/web-service/search#FindPlaceRequests
          */
-        findPlace: GoogleMapsClientEndpoint<FindPlaceRequest, SearchResponse>;
+        findPlace: GoogleMapsClientEndpoint<FindPlaceRequest, PlaceSearchResponse>;
         /**
          * Geocoding is the process of converting addresses (like "1600 Amphitheatre Parkway, Mountain View, CA")
          * into geographic coordinates (like latitude 37.423021 and longitude -122.083739),
@@ -238,10 +238,29 @@ declare module '@google/maps' {
          */
         nearestRoads: GoogleMapsClientEndpoint<NearestRoadsRequest, NearestRoadsResponse>;
         /**
+         * Once you have a place_id from a Place Search, you can request more details about a particular establishment
+         * or point of interest by initiating a Place Details request. A Place Details request returns more comprehensive
+         * information about the indicated place such as its complete address, phone number, user rating and reviews.
          * 
+         * @see https://developers.google.com/places/web-service/details
          */
         place: GoogleMapsClientEndpoint<PlaceDetailsRequest, PlaceDetailsResponse>;
-        // places: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * The Google Places API Text Search Service is a web service that returns information about a set of places
+         * based on a string — for example "pizza in New York" or "shoe stores near Ottawa" or "123 Main Street".
+         * The service responds with a list of places matching the text string and any location bias that has been set.
+         * 
+         * The service is especially useful for making ambiguous address queries in an automated system,
+         * and non-address components of the string may match businesses as well as addresses.
+         * Examples of ambiguous address queries are incomplete addresses, poorly formatted addresses,
+         * or a request that includes non-address components such as business names.
+         * 
+         * The search response will include a list of places. You can send a Place Details request
+         * for more information about any of the places in the response.
+         * 
+         * @see https://developers.google.com/places/web-service/search#TextSearchRequests
+         */
+        places: GoogleMapsClientEndpoint<PlacesRequest, PlaceSearchResponse>;
         // placesAutoComplete: GoogleMapsClientEndpoint<Request, Response>;
         // placesNearby: GoogleMapsClientEndpoint<Request, Response>;
         // placesPhoto: GoogleMapsClientEndpoint<Request, Response>;
@@ -1271,7 +1290,7 @@ declare module '@google/maps' {
          * 
          * **Note:** If you omit the fields parameter from a Find Place request, only the place_id for the result will be returned.
          */
-        fields?: (keyof SearchResponse)[];
+        fields?: (keyof PlaceSearchResponse)[];
         /**
          * Prefer results in a specified area, by specifying either a radius plus lat/lng, or two lat/lng pairs representing
          * the points of a rectangle. If this parameter is not specified, the API uses IP address biasing by default.
@@ -1279,7 +1298,7 @@ declare module '@google/maps' {
         locationbias?: string;
     }
 
-    export interface SearchResponse {
+    export interface PlaceSearchResponse {
         /** contains metadata on the request */
         status: SearchResponseStatus;
         /**
@@ -2200,5 +2219,71 @@ declare module '@google/maps' {
         Overall = 'overall',
         Quality = 'quality',
         Service = 'service',
+    }
+
+    export interface PlacesRequest {
+        /**
+         * The text string on which to search, for example: "restaurant" or "123 Main Street".
+         * The Google Places service will return candidate matches based on this string and order the results
+         * based on their perceived relevance. This parameter becomes optional if the `type` parameter
+         * is also used in the search request.
+         */
+        query: string;
+        /**
+         * The region code, specified as a ccTLD (country code top-level domain) two-character value.
+         * Most ccTLD codes are identical to ISO 3166-1 codes, with some exceptions.
+         * This parameter will only influence, not fully restrict, search results.
+         * If more relevant results exist outside of the specified region, they may be included.
+         * When this parameter is used, the country name is omitted from the resulting `formatted_address`
+         * for results in the specified region.
+         */
+        region?: string;
+        /** 
+         * The latitude/longitude around which to retrieve place information.
+         * This must be specified as latitude,longitude. If you specify a location parameter,
+         * you must also specify a radius parameter.
+         */
+        location?: LatLng;
+        /**
+         * Defines the distance (in meters) within which to bias place results.
+         * The maximum allowed radius is 50 000 meters.
+         * Results inside of this region will be ranked higher than results outside of the search circle;
+         * however, prominent results from outside of the search radius may be included.
+         */
+        radius?: number;
+        /**
+         * The language code, indicating in which language the results should be returned, if possible.
+         * Note that we often update supported languages so this list may not be exhaustive
+         */
+        language?: Language;
+        /**
+         * Restricts results to only those places within the specified price level.
+         * Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+         * The exact amount indicated by a specific value will vary from region to region.
+         */
+        minprice?: number;
+        /**
+         * Restricts results to only those places within the specified price level.
+         * Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+         * The exact amount indicated by a specific value will vary from region to region.
+         */
+        maxprice?: number;
+        /**
+         * Returns only those places that are open for business at the time the query is sent.
+         * Places that do not specify opening hours in the Google Places database will not be returned
+         * if you include this parameter in your query.
+         */
+        opennow?: boolean;
+        /**
+         * Returns the next 20 results from a previously run search.
+         * Setting a `pagetoken` parameter will execute a search with the same parameters used previously —
+         * all parameters other than `pagetoken` will be ignored.
+         */
+        pagetoken?: string;
+        /**
+         * Restricts the results to places matching the specified type.
+         * Only one type may be specified (if more than one type is provided, all types following the first entry are ignored).
+         */
+        type?: AddressType;
     }
 }
