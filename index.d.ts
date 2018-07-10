@@ -297,9 +297,19 @@ declare module '@google/maps' {
          */
         placesQueryAutoComplete: GoogleMapsClientEndpoint<QueryAutocompleteRequest, QueryAutocompleteResponse>;
         /**
+         * The Google Places API Radar Search Service allows you to search for up to 200 places at once,
+         * but with less detail than is typically returned from a Text Search or Nearby Search request.
+         * With Radar Search, you can create applications that help users identify specific areas of interest within a geographic area.
+         * 
+         * The search response will include up to 200 places, and will include only the following information about each place:
+         *  - The `geometry` field containing geographic coordinates.
+         *  - The `place_id`, which you can use in a Place Details request to get more information about the place.
+         * 
+         * @deprecated Radar search is deprecated as of June 30, 2018. After that time, this feature will no longer be available.
+         * 
          * @see https://developers.google.com/places/web-service/search#RadarSearchRequests
          */
-        // placesRadar: GoogleMapsClientEndpoint<Request, Response>;
+        placesRadar: GoogleMapsClientEndpoint<PlaceRadarRequest, PlaceSearchResponse>;
         /**
          * @see https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding
          */
@@ -2727,5 +2737,53 @@ declare module '@google/maps' {
          * These describe the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
          */
         matched_substring: PredictionSubstring[];
+    }
+
+    /** A Radar Search request must include at least one of `keyword`, `name`, or `type` */
+    export interface PlaceRadarRequest {
+        /** The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude */
+        location: LatLng;
+        /** Defines the distance (in meters) within which to return place results. The maximum allowed radius is 50 000 meters */
+        radius: number;
+        /**
+         * A term to be matched against all content that Google has indexed for this place, including but not limited to
+         * name, type, and address, as well as customer reviews and other third-party content.
+         */
+        keyword?: string;
+        /**
+         * The language code, indicating in which language the results should be returned, if possible.
+         * Searches are also biased to the selected language; results in the selected language may be given a higher ranking.
+         * Note that we often update supported languages so this list may not be exhaustive.
+         */
+        language?: string;
+        /**
+         * Restricts results to only those places within the specified price level.
+         * Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+         * The exact amount indicated by a specific value will vary from region to region.
+         */
+        minprice?: number;
+        /**
+         * Restricts results to only those places within the specified price level.
+         * Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+         * The exact amount indicated by a specific value will vary from region to region.
+         */
+        maxprice?: number;
+        /**
+         * A term to be matched against all content that Google has indexed for this place.
+         * Equivalent to keyword. The `name` field is no longer restricted to place names.
+         * Values in this field are combined with values in the `keyword` field and passed as part of the same search string.
+         * We recommend using only the `keyword` parameter for all search terms.
+         */
+        name?: string;
+        /**
+         * Returns only those places that are open for business at the time the query is sent.
+         * Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
+         */
+        opennow?: boolean;
+        /**
+         * Restricts the results to places matching the specified type.
+         * Only one type may be specified (if more than one type is provided, all types following the first entry are ignored).
+         */
+        type?: PlaceType;
     }
 }
