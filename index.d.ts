@@ -288,9 +288,14 @@ declare module '@google/maps' {
          */
         placesPhoto: GoogleMapsClientEndpoint<PlacePhotoRequest, PlacePhotoResponse>;
         /**
+         * The Query Autocomplete service allows you to add on-the-fly geographic query predictions to your application.
+         * Instead of searching for a specific location, a user can type in a categorical search, such as "pizza near New York"
+         * and the service responds with a list of suggested queries matching the string. As the Query Autocomplete service can match
+         * on both full words and substrings, applications can send queries as the user types to provide on-the-fly predictions.
+         * 
          * @see https://developers.google.com/places/web-service/query
          */
-        // placesQueryAutoComplete: GoogleMapsClientEndpoint<Request, Response>;
+        placesQueryAutoComplete: GoogleMapsClientEndpoint<QueryAutocompleteRequest, QueryAutocompleteResponse>;
         /**
          * @see https://developers.google.com/places/web-service/search#RadarSearchRequests
          */
@@ -2637,4 +2642,90 @@ declare module '@google/maps' {
      *  - Your request did not include either a `maxwidth` or `maxheight` parameter.
      */
     export type PlacePhotoResponse = string;
+
+    export interface QueryAutocompleteRequest {
+        /**
+         * The text string on which to search.
+         * The Places service will return candidate matches based on this string and order results based on their perceived relevance.
+         */
+        input: string;
+        /**
+         * The character position in the input term at which the service uses text for predictions.
+         * For example, if the input is 'Googl' and the completion point is 3, the service will match on 'Goo'.
+         * The offset should generally be set to the position of the text caret.
+         * If no offset is supplied, the service will use the entire term.
+         */
+        offset?: number;
+        /** The point around which you wish to retrieve place information. Must be specified as latitude,longitude */
+        location?: LatLng;
+        /**
+         * The distance (in meters) within which to return place results.
+         * Note that setting a radius biases results to the indicated area, but may not fully restrict results to the specified area.
+         */
+        radius?: number;
+        /**
+         * The language code, indicating in which language the results should be returned, if possible.
+         * Searches are also biased to the selected language; results in the selected language may be given a higher ranking.
+         * If language is not supplied, the Places service will attempt to use the native language of the domain from which the request is sent.
+         */
+        language?: Language;
+    }
+
+    export interface QueryAutocompleteResponse {
+        /** contains metadata on the request */
+        status: QueryAutocompleteResponseStatus;
+        /**
+         * When the Places service returns a status code other than `OK`, there may be an additional `error_message` field
+         * within the response object. This field contains more detailed information about the reasons behind the given status code.
+         */
+        error_message: string;
+        /** containing information about a single query prediction */
+        predictions: QueryAutocompleteResult[];
+    }
+
+    /**
+     * The `status` field within the Query Autocomplete response object contains the status of the request,
+     * and may contain debugging information to help you track down why the request failed.
+     */
+    export enum QueryAutocompleteResponseStatus {
+        /** indicates that no errors occurred and at least one result was returned */
+        OK = 'OK',
+        /**
+         * indicates that the search was successful but returned no results.
+         * This may occur if the search was passed a bounds in a remote location.
+         */
+        ZERO_RESULTS = 'ZERO_RESULTS',
+        /** indicates that you are over your quota */
+        OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+        /** indicates that your request was denied, generally because the key parameter is missing or invalid */
+        REQUEST_DENIED = 'REQUEST_DENIED',
+        /** generally indicates that the input parameter is missing */
+        INVALID_REQUEST = 'INVALID_REQUEST',
+        /** indicates a server-side error; trying again may be successful */
+        UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+    }
+
+    /**
+     * When the Places service returns JSON results from a search, it places them within a `predictions` array.
+     * Even if the service returns no results (such as if the `location` is remote) it still returns an empty `predictions` array.
+     * XML responses consist of zero or more `<prediction>` elements.
+     * 
+     * Note that some of the predictions may be places, and the `place_id` and `types` fields will be included with those predictions.
+     * See [Place Autocomplete Results](https://developers.google.com/places/web-service/autocomplete#place_autocomplete_results)
+     * for information about these results.
+     */
+    export interface QueryAutocompleteResult {
+        /** contains the human-readable name for the returned result. For establishment results, this is usually the business name */
+        description
+        /**
+         * contains an array of terms identifying each section of the returned description
+         * (a section of the description is generally terminated with a comma).
+         */
+        terms: PredictionTerm[];
+        /**
+         * contains an `offset` value and a `length`.
+         * These describe the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
+         */
+        matched_substring: PredictionSubstring[];
+    }
 }
