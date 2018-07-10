@@ -219,7 +219,7 @@ declare module '@google/maps' {
          * into geographic coordinates (like latitude 37.423021 and longitude -122.083739),
          * which you can use to place markers on a map, or position the map.
          * 
-         * @see https://developers.google.com/maps/documentation/geocoding/intro
+         * @see https://developers.google.com/maps/documentation/geocoding/intro#GeocodingRequests
          */
         geocode: GoogleMapsClientEndpoint<GeocodeRequest, GeocodeResponse>;
         /**
@@ -266,16 +266,45 @@ declare module '@google/maps' {
          * The request specifies a textual search string and optional geographic bounds.
          * The service can be used to provide autocomplete functionality for text-based geographic searches,
          * by returning places such as businesses, addresses and points of interest as a user types.
+         * 
+         * @see https://developers.google.com/places/web-service/autocomplete
          */
         placesAutoComplete: GoogleMapsClientEndpoint<PlaceAutocompleteRequest, PlaceAutocompleteResponse>;
+        /**
+         * @see https://developers.google.com/places/web-service/search#PlaceSearchRequests
+         */
         // placesNearby: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * @see https://developers.google.com/places/web-service/photos
+         */
         // placesPhoto: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * @see https://developers.google.com/places/web-service/query
+         */
         // placesQueryAutoComplete: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * @see https://developers.google.com/places/web-service/search#RadarSearchRequests
+         */
         // placesRadar: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * @see https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding
+         */
         // reverseGeocode: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * @see https://developers.google.com/maps/documentation/roads/speed-limits
+         */
         // snappedSpeedLimits: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * @see https://developers.google.com/maps/documentation/roads/snap
+         */
         // snapToRoads: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * @see https://developers.google.com/maps/documentation/roads/speed-limits
+         */
         // speedLimits: GoogleMapsClientEndpoint<Request, Response>;
+        /**
+         * @see https://developers.google.com/maps/documentation/timezone/intro
+         */
         // timezone: GoogleMapsClientEndpoint<Request, Response>;
     }
 
