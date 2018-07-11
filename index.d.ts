@@ -315,9 +315,17 @@ declare module '@google/maps' {
          */
         reverseGeocode: GoogleMapsClientEndpoint<ReverseGeocodingRequest, ReverseGeocodingResponse>;
         /**
+         * The Roads API returns the posted speed limit for a given road segment.
+         * In the case of road segments with variable speed limits, the default speed limit for the segment is returned.
+         * 
+         * The accuracy of speed limit data returned by the Roads API cannot be guaranteed.
+         * The speed limit data provided is not real-time, and may be estimated, inaccurate, incomplete, and/or outdated.
+         * You may report inaccuracies in our speed limit data by filing a case in the
+         * [Google Cloud Support Portal](https://developers.google.com/maps/premium/support#support_portal).
+         * 
          * @see https://developers.google.com/maps/documentation/roads/speed-limits
          */
-        // snappedSpeedLimits: GoogleMapsClientEndpoint<Request, Response>;
+        snappedSpeedLimits: GoogleMapsClientEndpoint<SnappedSpeedLimitsRequest, SpeedLimitsResponse>;
         /**
          * @see https://developers.google.com/maps/documentation/roads/snap
          */
@@ -2949,5 +2957,76 @@ declare module '@google/maps' {
         INVALID_REQUEST = 'INVALID_REQUEST',
         /** indicates that the request could not be processed due to a server error. The request may succeed if you try again */
         UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+    }
+
+    export interface SnappedSpeedLimitsRequest {
+        /**
+         * A list of latitude/longitude pairs representing a path. Latitude and longitude values must be separated by commas.
+         * Latitude/longitude pairs must be separated by the pipe character: "|".
+         * When you supply the `path` parameter, the API first snaps the path to the most likely road traveled by a vehicle
+         * (as it does for the [snapToRoads](https://developers.google.com/maps/documentation/roads/snap) request),
+         * then determines the speed limit for the relevant road segment.
+         * If you don't want the API to snap the path, you must pass a `placeId` parameter as explained below.
+         * The following example shows the `path` parameter with three latitude/longitude pairs:
+         * `path=60.170880,24.942795|60.170879,24.942796|60.170877,24.942796`.
+         */
+        path: LatLng[];
+        /**
+         * The place ID(s) representing one or more road segments.
+         * Make sure each place ID refers to a road segment and not a different type of place.
+         * You can pass up to 100 place IDs with each request.
+         * The API does not perform road-snapping on the supplied place IDs.
+         * The response includes a speed limit for each place ID in the request.
+         * You can send a [snapToRoads](https://developers.google.com/maps/documentation/roads/snap) or
+         * [nearestRoads](https://developers.google.com/maps/documentation/roads/nearest) request to find
+         * the relevant place IDs then supply them as input to the `speedLimits` request.
+         * The following example shows the `placeId` parameter with two place IDs:
+         * `placeId=ChIJX12duJAwGQ0Ra0d4Oi4jOGE&placeId=ChIJLQcticc0GQ0RoiNZJVa5GxU`
+         */
+        placeId?: string;
+        /**
+         * Whether to return speed limits in kilometers or miles per hour. This can be set to either `KPH` or `MPH`.
+         * 
+         * @default SpeedLimitUnit.KPH
+         */
+        units?: SpeedLimitUnit;
+    }
+
+    export enum SpeedLimitUnit {
+        KPH = 'KPH',
+        MPH = 'MPH',
+    }
+
+    export interface SpeedLimitsResponse {
+        /** An array of road metadata */
+        speedLimits: SpeedLimit[];
+        /** an array of snapped points. This array is present only if the request contained a path parameter */
+        snappedPoints: SnappedPoint[];
+    }
+
+    export interface SpeedLimit {
+        /** A unique identifier for a place. All place IDs returned by the Roads API will correspond to road segments */
+        placeId: string;
+        /** The speed limit for that road segment */
+        speedLimit: number;
+        /** Returns either `KPH` or `MPH` */
+        units: SpeedLimitUnit;
+    }
+
+    export interface SnappedPoint {
+        /** contains a `latitude` and `longitude` value */
+        location: LatLng;
+        /**
+         * An integer that indicates the corresponding value in the original request.
+         * Each value in the request should map to a snapped value in the response.
+         * These values are indexed from `0`, so a point with an `originalIndex` of `4` will be the snapped value
+         * of the 5th latitude/longitude passed to the `path` parameter.
+         */
+        originalIndex: number;
+        /**
+         * A unique identifier for a place. All place IDs returned by the Roads API will correspond to road segments.
+         * The `placeId` can be passed in a speed limits request to determine the speed limit along that road segment.
+         */
+        placeId: string;
     }
 }
