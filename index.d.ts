@@ -347,9 +347,14 @@ declare module '@google/maps' {
          */
         speedLimits: GoogleMapsClientEndpoint<SpeedLimitsRequest, SpeedLimitsResponse>;
         /**
+         * The Time Zone API provides a simple interface to request the time zone for locations on the surface of the earth,
+         * as well as the time offset from UTC for each of those locations. You request the time zone information for
+         * a specific latitude/longitude pair and date. The API returns the name of that time zone, the time offset from UTC,
+         * and the daylight savings offset.
+         * 
          * @see https://developers.google.com/maps/documentation/timezone/intro
          */
-        // timezone: GoogleMapsClientEndpoint<Request, Response>;
+        timezone: GoogleMapsClientEndpoint<TimeZoneRequest, TimeZoneResponse>;
     }
 
     export interface DirectionsRequest {
@@ -3078,5 +3083,83 @@ declare module '@google/maps' {
     export interface SnapToRoadsResponse {
         /** An array of snapped points */
         snappedPoints: SnappedPoint[];
+    }
+
+    /**
+     * Time Zone API requests are constructed as a URL string.
+     * The API returns time zone data for a point on the earth, specified by a latitude/longitude pair.
+     * Note that time zone data may not be available for locations over water, such as oceans or seas.
+     */
+    export interface TimeZoneRequest {
+        /** a comma-separated `lat,lng` tuple (eg. `location=-33.86,151.20`), representing the location to look up */
+        location:LatLng;
+        /**
+         * specifies the desired time as seconds since midnight, January 1, 1970 UTC.
+         * The Time Zone API uses the timestamp to determine whether or not Daylight Savings should be applied,
+         * based on the time zone of the location. Note that the API does not take historical time zones into account.
+         * That is, if you specify a past timestamp, the API does not take into account the possibility that
+         * the location was previously in a different time zone.
+         */
+        timestamp?: Date | number;
+        /**
+         * The language in which to return results.
+         * Note that we often update supported languages so this list may not be exhaustive.
+         * 
+         * @default Language.English
+         */
+        language?: Language;
+    }
+
+    /** For each valid request, the time zone service will return a response in the format indicated within the request URL */
+    export interface TimeZoneResponse {
+        /**
+         * the offset for daylight-savings time in seconds.
+         * This will be zero if the time zone is not in Daylight Savings Time during the specified `timestamp`.
+         */
+        dstOffset: number;
+        /** the offset from UTC (in seconds) for the given location. This does not take into effect daylight savings */
+        rawOffset: number;
+        /**
+         * a string containing the ID of the time zone, such as "America/Los_Angeles" or "Australia/Sydney".
+         * These IDs are defined by [Unicode Common Locale Data Repository (CLDR) project](http://cldr.unicode.org/),
+         * and currently available in file [timezone.xml](http://unicode.org/repos/cldr/trunk/common/bcp47/timezone.xml).
+         * When a timezone has several IDs, the canonical one is returned. In timezone.xml, this is the first alias of each timezone.
+         * For example, "Asia/Calcutta" is returned, not "Asia/Kolkata".
+         */
+        timeZoneId: string;
+        /**
+         * a string containing the long form name of the time zone.
+         * This field will be localized if the `language` parameter is set.
+         * eg. "Pacific Daylight Time" or "Australian Eastern Daylight Time"
+         */
+        timeZoneName: string;
+        /** a string indicating the status of the response */
+        status: TimeZoneResponseStatus;
+        /** more detailed information about the reasons behind the given status code, if other than `OK` */
+        errorMessage: string;
+    }
+
+    export enum TimeZoneResponseStatus {
+        /** indicates that the request was successful */
+        OK = 'OK',
+        /** indicates that the request was malformed */
+        INVALID_REQUEST = 'INVALID_REQUEST',
+        /**
+         * indicates any of the following:
+         *  - The API `key` is missing or invalid.
+         *  - Billing has not been enabled on your account.
+         *  - A self-imposed usage cap has been exceeded.
+         *  - The provided method of payment is no longer valid (for example, a credit card has expired).
+         * See the [Maps FAQ](https://developers.google.com/maps/faq#over-limit-key-error) to learn how to fix this.
+         */
+        OVER_DAILY_LIMIT = 'OVER_DAILY_LIMIT',
+        /** indicates the requestor has exceeded quota */
+        OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+        /** indicates that the API did not complete the request. Confirm that the request was sent over HTTPS instead of HTTP */
+        REQUEST_DENIED = 'REQUEST_DENIED',
+        /** indicates an unknown error */
+        UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+        /** indicates that no time zone data could be found for the specified position or time. Confirm that the request is for a location on land, and not over water */
+        ZERO_RESULTS = 'ZERO_RESULTS',
     }
 }
