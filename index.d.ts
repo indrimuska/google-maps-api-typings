@@ -221,7 +221,7 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/geocoding/intro#GeocodingRequests
          */
-        geocode: GoogleMapsClientEndpoint<GeocodeRequest, GeocodeResponse>;
+        geocode: GoogleMapsClientEndpoint<GeocodingRequest, GeocodingResponse>;
         /**
          * The Geolocation API returns a location and accuracy radius based on information about cell towers and WiFi nodes
          * that the mobile client can detect. This document describes the protocol used to send this data to the server and
@@ -229,7 +229,7 @@ declare module '@google/maps' {
          * 
          * @see https://developers.google.com/maps/documentation/geolocation/intro
          */
-        geolocate: GoogleMapsClientEndpoint<GeolocateRequest, GeolocateResponse>;
+        geolocate: GoogleMapsClientEndpoint<GeolocationRequest, GeolocationResponse>;
         /**
          * The Roads API takes up to 100 independent coordinates, and returns the closest road segment for each point.
          * The points passed do not need to be part of a continuous path.
@@ -313,7 +313,7 @@ declare module '@google/maps' {
         /**
          * @see https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding
          */
-        // reverseGeocode: GoogleMapsClientEndpoint<Request, Response>;
+        reverseGeocode: GoogleMapsClientEndpoint<ReverseGeocodingRequest, ReverseGeocodingResponse>;
         /**
          * @see https://developers.google.com/maps/documentation/roads/speed-limits
          */
@@ -1515,7 +1515,7 @@ declare module '@google/maps' {
          * may contain a pair of day and time objects describing when the place closes.
          * **Note:** If a place is **always open**, the `close` section will be missing from the response.
          * Clients can rely on always-open being represented as an `open` period containing `day` with value 0
-         * and `time` with value 0000, and no `close`. */
+         * and `time` with value 0000, and no `close` */
         close?: OpeningHoursTime;
         /**
          * is an array of seven strings representing the formatted opening hours for each day of the week.
@@ -1567,7 +1567,7 @@ declare module '@google/maps' {
         scope: PlaceIdScope.APP;
     }
 
-    export interface GeocodeRequest {
+    export interface GeocodingRequest {
         /**
          * The street address that you want to geocode, in the format used by the national postal service of the country concerned.
          * Additional address elements such as business names and unit, suite or floor numbers should be avoided.
@@ -1603,7 +1603,7 @@ declare module '@google/maps' {
          * The components filter is *required* if the request doesn't include an `address`.
          * Each element in the components filter consists of a `component:value` pair, and fully restricts the results from the geocoder.
          */
-        components?: GeocodeComponents;
+        components?: GeocodingComponents;
     }
 
     /**
@@ -1620,7 +1620,7 @@ declare module '@google/maps' {
      * 
      * A geocode for "High St, Hastings" with `components=country:GB` returns a result in Hastings, England rather than in Hastings-On-Hudson, USA
      */
-    export interface GeocodeComponents {
+    export interface GeocodingComponents {
         /** matches `postal_code` and `postal_code_prefix` */
         postalCode?: string;
         /**
@@ -1637,9 +1637,9 @@ declare module '@google/maps' {
         administrativeArea?: string;
     }
 
-    export interface GeocodeResponse {
+    export interface GeocodingResponse<STATUSES = GeocodingResponseStatus> {
         /** contains metadata on the request */
-        status: GeocodeResponseStatus;
+        status: STATUSES;
         /**
          * When the geocoder returns a status code other than `OK`, there may be an additional `error_message` field
          * within the Geocoding response object. This field contains more detailed information about the reasons behind the given status code.
@@ -1651,14 +1651,14 @@ declare module '@google/maps' {
          * Generally, only one entry in the `"results"` array is returned for address lookups,though the geocoder may return several results
          * when address queries are ambiguous. 
          */
-        results: GeocodeResult[];
+        results: GeocodingResult[];
     }
 
     /**
      * The `"status" `field within the Geocoding response object contains the status of the request,
      * and may contain debugging information to help you track down why geocoding is not working.
      */
-    export enum GeocodeResponseStatus {
+    export enum GeocodingResponseStatus {
         /** indicates that no errors occurred; the address was successfully parsed and at least one geocode was returned */
         OK = 'OK',
         /**
@@ -1690,14 +1690,14 @@ declare module '@google/maps' {
      * Even if the geocoder returns no results (such as if the address doesn't exist) it still returns an empty `results` array.
      * (XML responses consist of zero or more `<result>` elements.)
      */
-    export interface GeocodeResult {
+    export interface GeocodingResult {
         /**
          * array indicates the type of the returned result.
          * This array contains a set of zero or more tags identifying the type of feature returned in the result.
          * For example, a geocode of "Chicago" returns "locality" which indicates that "Chicago" is a city,
          * and also returns "political" which indicates it is a political entity.
          */
-        types: (PlaceType | GeocodeAddressType)[];
+        types: (PlaceType | GeocodingAddressType)[];
         /**
          * is a string containing the human-readable address of this location.
          * 
@@ -1765,7 +1765,7 @@ declare module '@google/maps' {
         place_id: string;
     }
 
-    export enum GeocodeAddressType {
+    export enum GeocodingAddressType {
         /** indicates the floor of a building address */
         floor = 'floor',
         /** typically indicates a place that has not yet been categorized */
@@ -1792,7 +1792,7 @@ declare module '@google/maps' {
 
     export interface AddressComponent {
         /** is an array indicating the *type* of the address component */
-        types: (PlaceType | GeocodeAddressType)[];
+        types: (PlaceType | GeocodingAddressType)[];
         /** is the full text description or name of the address component as returned by the Geocoder */
         long_name: string;
         /**
@@ -1850,7 +1850,7 @@ declare module '@google/maps' {
         compound_code: string;
     }
 
-    export interface GeolocateRequest {
+    export interface GeolocationRequest {
         /** The mobile country code (MCC) for the device's home network */
         homeMobileCountryCode?: number;
         /** The mobile network code (MNC) for the device's home network */
@@ -1913,7 +1913,7 @@ declare module '@google/maps' {
         signalToNoiseRatio?: number;
     }
 
-    export interface GeolocateResponse {
+    export interface GeolocationResponse {
         /** The user's estimated latitude and longitude, in degrees. Contains one `lat` and one `lng` subfield */
         location: LatLng;
         /** The accuracy of the estimated location, in meters. This represents the radius of a circle around the given location */
@@ -1924,7 +1924,7 @@ declare module '@google/maps' {
      * In the case of an error, a standard format error response body will be returned
      * and the HTTP status code will be set to an error status.
      */
-    export interface GeolocateError {
+    export interface GeolocationError {
         error: {
             /** This is the same as the HTTP status of the response */
             code: number;
@@ -1936,13 +1936,13 @@ declare module '@google/maps' {
              */
             errors: {
                 domain: string;
-                reason: GeolocateErrorReason;
+                reason: GeolocationErrorReason;
                 message: string;
             }[];
         }
     }
 
-    export enum GeolocateErrorReason {
+    export enum GeolocationErrorReason {
         /**
          * You have exceeded your daily limit.
          * Domain: usageLimits
@@ -2258,7 +2258,7 @@ declare module '@google/maps' {
          * has a `vicinity` value of `48 Pirrama Road, Pyrmont`.
          */
         vicinity: number;
-        /** lists the authoritative website for this place, such as a business' homepage. */
+        /** lists the authoritative website for this place, such as a business' homepage */
         website: string;
     }
 
@@ -2785,5 +2785,169 @@ declare module '@google/maps' {
          * Only one type may be specified (if more than one type is provided, all types following the first entry are ignored).
          */
         type?: PlaceType;
+    }
+
+    /**
+     * f both `result_type` and `location_type` filters are present then the API returns only those results that match both the
+     * `result_type` and the `location_type` values. If none of the filter values are acceptable, the API returns `ZERO_RESULTS`.
+     */
+    export interface ReverseGeocodingRequest {
+        /** The latitude and longitude values specifying the location for which you wish to obtain the closest, human-readable address */
+        latlng?: LatLng;
+        /**
+         * The place ID of the place for which you wish to obtain the human-readable address.
+         * The place ID is a unique identifier that can be used with other Google APIs.
+         * For example, you can use the `placeID` returned by the Roads API to get the address for a snapped point.
+         * The place ID may only be specified if the request includes an API key or a Google Maps APIs Premium Plan client ID.
+         */
+        place_id?: string;
+        /**
+         * The language in which to return results.
+         *  - Google often updates the supported languages, so this list may not be exhaustive.
+         *  - If `language` is not supplied, the geocoder attempts to use the preferred language as specified in the
+         *      `Accept-Language` header, or the native language of the domain from which the request is sent.
+         *  - The geocoder does its best to provide a street address that is readable for both the user and locals.
+         *      To achieve that goal, it returns street addresses in the local language, transliterated to a script readable by the user
+         *      if necessary, observing the preferred language. All other addresses are returned in the preferred language.
+         *      Address components are all returned in the same language, which is chosen from the first component.
+         *  - If a name is not available in the preferred language, the geocoder uses the closest match.
+         */
+        language?: Language;
+        /**
+         * A filter of one or more address types, separated by a pipe (`|`).
+         * If the parameter contains multiple address types, the API returns all addresses that match any of the types.
+         * A note about processing: The `result_type` parameter does not restrict the search to the specified address type(s).
+         * Rather, the `result_type` acts as a post-search filter: the API fetches all results for the specified `latlng`,
+         * then discards those results that do not match the specified address type(s).
+         * Note: This parameter is available only for requests that include an API key or a client ID.
+         */
+        result_type?: ReverseGeocodingResultType;
+        /**
+         * A filter of one or more location types, separated by a pipe (`|`).
+         * If the parameter contains multiple location types, the API returns all addresses that match any of the types.
+         * A note about processing: The `location_type` parameter does not restrict the search to the specified location type(s).
+         * Rather, the `location_type` acts as a post-search filter: the API fetches all results for the specified `latlng`,
+         * then discards those results that do not match the specified location type(s).
+         * Note: This parameter is available only for requests that include an API key or a client ID.
+         */
+        location_type?: ReverseGeocodingLocationType;
+    }
+
+    /** Supported values for a Reverse Geocoding request */
+    export enum ReverseGeocodingResultType {
+        /** indicates a precise street address */
+        street_address = 'street_address',
+        /** indicates a named route (such as "US 101") */
+        route = 'route',
+        /** indicates a major intersection, usually of two major roads */
+        intersection = 'intersection',
+        /** indicates a political entity. Usually, this type indicates a polygon of some civil administration */
+        political = 'political',
+        /** indicates the national political entity, and is typically the highest order type returned by the Geocoder */
+        country = 'country',
+        /**
+         * indicates a first-order civil entity below the country level. Within the United States, these administrative levels are states.
+         * Not all nations exhibit these administrative levels. In most cases, `administrative_area_level_1` short names
+         * will closely match ISO 3166-2 subdivisions and other widely circulated lists;
+         * however this is not guaranteed as our geocoding results are based on a variety of signals and location data.
+         */
+        administrative_area_level_1 = 'administrative_area_level_1',
+        /**
+         * indicates a second-order civil entity below the country level. Within the United States, these administrative levels are counties.
+         * Not all nations exhibit these administrative levels.
+         */
+        administrative_area_level_2 = 'administrative_area_level_2',
+        /**
+         * indicates a third-order civil entity below the country level.
+         * This type indicates a minor civil division. Not all nations exhibit these administrative levels.
+         */
+        administrative_area_level_3 = 'administrative_area_level_3',
+        /**
+         * indicates a fourth-order civil entity below the country level.
+         * This type indicates a minor civil division. Not all nations exhibit these administrative levels.
+         */
+        administrative_area_level_4 = 'administrative_area_level_4',
+        /**
+         * indicates a fifth-order civil entity below the country level.
+         * This type indicates a minor civil division. Not all nations exhibit these administrative levels.
+         */
+        administrative_area_level_5 = 'administrative_area_level_5',
+        /** indicates a commonly-used alternative name for the entity */
+        colloquial_area = 'colloquial_area',
+        /** indicates an incorporated city or town political entity */
+        locality = 'locality',
+        /** indicates a specific type of Japanese locality, to facilitate distinction between multiple locality components within a Japanese address */
+        ward = 'ward',
+        /**
+         * indicates a first-order civil entity below a locality. For some locations may receive one of the additional types:
+         * `sublocality_level_1` to `sublocality_level_5`. Each sublocality level is a civil entity.
+         * Larger numbers indicate a smaller geographic area.
+         */
+        sublocality = 'sublocality',
+        /** indicates a named neighborhood */
+        neighborhood = 'neighborhood',
+        /** indicates a named location, usually a building or collection of buildings with a common name */
+        premise = 'premise',
+        /** indicates a first-order entity below a named location, usually a singular building within a collection of buildings with a common name */
+        subpremise = 'subpremise',
+        /** indicates a postal code as used to address postal mail within the country */
+        postal_code = 'postal_code',
+        /** indicates a prominent natural feature */
+        natural_feature = 'natural_feature',
+        /** indicates an airport */
+        airport = 'airport',
+        /** indicates a named park */
+        park = 'park',
+        /**
+         * indicates a named point of interest. Typically, these "POI"s are prominent local entities that don't easily fit in another category,
+         * such as "Empire State Building" or "Statue of Liberty.
+         */
+        point_of_interest = 'point_of_interest',
+    }
+
+    export enum ReverseGeocodingLocationType {
+        /** returns only the addresses for which Google has location information accurate down to street address precision */
+        ROOFTOP = 'ROOFTOP',
+        /**
+         * returns only the addresses that reflect an approximation (usually on a road) interpolated between two precise points (such as intersections).
+         * An interpolated range generally indicates that rooftop geocodes are unavailable for a street address.
+         */
+        RANGE_INTERPOLATED = 'RANGE_INTERPOLATED',
+        /** returns only geometric centers of a location such as a polyline (for example, a street) or polygon (region) */
+        GEOMETRIC_CENTER = 'GEOMETRIC_CENTER',
+        /** returns only the addresses that are characterized as approximate */
+        APPROXIMATE = 'APPROXIMATE',
+    }
+
+    export type ReverseGeocodingResponse = GeocodingResponse<ReverseGeocodingResponseStatus>;
+
+    /**
+     * The `"status"` field within the Geocoding response object contains the status of the request,
+     * and may contain debugging information to help you track down why reverse geocoding is not working.
+     */
+    export enum ReverseGeocodingResponseStatus {
+        /** indicates that no errors occurred and at least one address was returned */
+        OK = 'OK',
+        /**
+         * indicates that the reverse geocoding was successful but returned no results.
+         * This may occur if the geocoder was passed a latlng in a remote location.
+         */
+        ZERO_RESULTS = 'ZERO_RESULTS',
+        /** indicates that you are over your quota */
+        OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+        /**
+         * indicates that the request was denied.
+         * Possibly because the request includes a `result_type` or `location_type` parameter but does not include
+         * an API key or client ID.
+         */
+        REQUEST_DENIED = 'REQUEST_DENIED',
+        /**
+         * generally indicates one of the following:
+         *  - The query (`address`, `components` or `latlng`) is missing.
+         *  - An invalid `result_type` or `location_type` was given.
+         */
+        INVALID_REQUEST = 'INVALID_REQUEST',
+        /** indicates that the request could not be processed due to a server error. The request may succeed if you try again */
+        UNKNOWN_ERROR = 'UNKNOWN_ERROR',
     }
 }
