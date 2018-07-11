@@ -335,9 +335,17 @@ declare module '@google/maps' {
          */
         snapToRoads: GoogleMapsClientEndpoint<SnapToRoadsRequest, SnapToRoadsResponse>;
         /**
+         * The Roads API returns the posted speed limit for a given road segment.
+         * In the case of road segments with variable speed limits, the default speed limit for the segment is returned.
+         * 
+         * The accuracy of speed limit data returned by the Roads API cannot be guaranteed.
+         * The speed limit data provided is not real-time, and may be estimated, inaccurate, incomplete, and/or outdated.
+         * You may report inaccuracies in our speed limit data by filing a case in the
+         * [Google Cloud Support Portal](https://developers.google.com/maps/premium/support#support_portal).
+         * 
          * @see https://developers.google.com/maps/documentation/roads/speed-limits
          */
-        // speedLimits: GoogleMapsClientEndpoint<Request, Response>;
+        speedLimits: GoogleMapsClientEndpoint<SpeedLimitsRequest, SpeedLimitsResponse>;
         /**
          * @see https://developers.google.com/maps/documentation/timezone/intro
          */
@@ -2976,6 +2984,15 @@ declare module '@google/maps' {
          */
         path: LatLng[];
         /**
+         * Whether to return speed limits in kilometers or miles per hour. This can be set to either `KPH` or `MPH`.
+         * 
+         * @default SpeedLimitUnit.KPH
+         */
+        units?: SpeedLimitUnit;
+    }
+
+    export interface SpeedLimitsRequest {
+        /**
          * The place ID(s) representing one or more road segments.
          * Make sure each place ID refers to a road segment and not a different type of place.
          * You can pass up to 100 place IDs with each request.
@@ -2987,7 +3004,7 @@ declare module '@google/maps' {
          * The following example shows the `placeId` parameter with two place IDs:
          * `placeId=ChIJX12duJAwGQ0Ra0d4Oi4jOGE&placeId=ChIJLQcticc0GQ0RoiNZJVa5GxU`
          */
-        placeId?: string;
+        placeId: string;
         /**
          * Whether to return speed limits in kilometers or miles per hour. This can be set to either `KPH` or `MPH`.
          * 
