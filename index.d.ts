@@ -86,6 +86,14 @@ declare module '@google/maps' {
         finally(callback: Function): RequestHandle<T>;
     }
 
+    export type LatLngArray = [number, number];
+
+    export type LatLngString = string;
+
+    export type LatLngLiteral = { lat: number; lng: number };
+
+    export type LatLngLiteralVerbose = { latitude: number; longitude: number };
+
     /**
      * A latitude, longitude pair. The API methods accept either:
      *  - a two-item array of [latitude, longitude];
@@ -94,18 +102,16 @@ declare module '@google/maps' {
      *  - an object with 'latitude', 'longitude' properties.
      */
     export type LatLng = (
-        [number, number] |
-        string |
-        { lat: number; lng: number } |
-        { latitude: number; longitude: number }
+        LatLngArray |
+        LatLngString |
+        LatLngLiteral |
+        LatLngLiteralVerbose
     );
 
     /** The bounds parameter defines the latitude/longitude coordinates of the southwest and northeast corners of this bounding box. */
     export interface LatLngBounds {
-        south: number;
-        west: number;
-        north: number;
-        east: number;
+        northeast: LatLngLiteral;
+        southwest: LatLngLiteral;
     }
 
     /**
@@ -850,7 +856,7 @@ declare module '@google/maps' {
          * An array of LatLngs representing the entire course of this route. The path is simplified in order to make
          * it suitable in contexts where a small number of vertices is required (such as Static Maps API URLs).
          */
-        overview_path: LatLng[];
+        overview_path: LatLngLiteral[];
     }
 
     export interface TransitFare {
@@ -909,14 +915,14 @@ declare module '@google/maps' {
          * at the start and end points, `start_location` may be different than the provided origin of this leg if, for example,
          * a road is not near the origin.
          */
-        start_location: LatLng;
+        start_location: LatLngLiteral;
         /**
          * contains the latitude/longitude coordinates of the given destination of this leg.
          * Because the Directions API calculates directions between locations by using the nearest transportation option (usually a road)
          * at the start and end points, `end_location` may be different than the provided destination of this leg if, for example,
          * a road is not near the destination.
          */
-        end_location: LatLng;
+        end_location: LatLngLiteral;
         /** contains the human-readable address (typically a street address) resulting from reverse geocoding the `start_location` of this leg. */
         start_address: string;
         /** contains the human-readable address (typically a street address) from reverse geocoding the `end_location` of this leg. */
@@ -951,9 +957,9 @@ declare module '@google/maps' {
          */
         duration: Duration;
         /** contains the location of the starting point of this step, as a single set of `lat` and `lng` fields. */
-        start_location: LatLng;
+        start_location: LatLngLiteral;
         /** contains the location of the last point of this step, as a single set of `lat` and `lng` fields. */
-        end_location: LatLng;
+        end_location: LatLngLiteral;
         /**
          * contains the action to take for the current step (turn left, merge, straight, etc.).
          * This field is used to determine which icon to display.
@@ -1063,7 +1069,7 @@ declare module '@google/maps' {
         /** the name of the transit station/stop. eg. "Union Square". */
         name: string;
         /** the location of the transit station/stop, represented as a `lat` and `lng` field. */
-        location: LatLng;
+        location: LatLngLiteral;
     }
 
     export interface TransitLine {
@@ -1425,7 +1431,7 @@ declare module '@google/maps' {
          * A `location` element (containing `lat` and `lng` elements) of the position for which elevation data is being computed.
          * Note that for path requests, the set of `location` elements will contain the sampled points along the path.
          */
-        location: LatLng;
+        location: LatLngLiteral;
         /** An `elevation` element indicating the elevation of the location in meters. */
         elevation: number;
         /**
@@ -1630,7 +1636,8 @@ declare module '@google/maps' {
          * may contain a pair of day and time objects describing when the place closes.
          * **Note:** If a place is **always open**, the `close` section will be missing from the response.
          * Clients can rely on always-open being represented as an `open` period containing `day` with value 0
-         * and `time` with value 0000, and no `close`. */
+         * and `time` with value 0000, and no `close`.
+         */
         close?: OpeningHoursTime;
         /**
          * is an array of seven strings representing the formatted opening hours for each day of the week.
@@ -2083,7 +2090,7 @@ declare module '@google/maps' {
 
     export interface AddressGeometry {
         /** contains the geocoded latitude, longitude value. For normal address lookups, this field is typically the most important. */
-        location: LatLng;
+        location: LatLngLiteral;
         /** stores additional data about the specified location. */
         location_type: LocationType;
         /**
@@ -2193,7 +2200,7 @@ declare module '@google/maps' {
 
     export interface GeolocationResponse {
         /** The user's estimated latitude and longitude, in degrees. Contains one `lat` and one `lng` subfield. */
-        location: LatLng;
+        location: LatLngLiteral;
         /** The accuracy of the estimated location, in meters. This represents the radius of a circle around the given location. */
         accuracy: number;
     }
@@ -2269,7 +2276,7 @@ declare module '@google/maps' {
         /** An array of snapped points. */
         snappedPoints: {
             /** Contains a `latitude` and `longitude` value. */
-            location: LatLng;
+            location: LatLngLiteralVerbose;
             /**
              * An integer that indicates the corresponding value in the original request.
              * Each point in the request maps to at most two segmentsin the response:
@@ -3230,7 +3237,7 @@ declare module '@google/maps' {
 
     export interface SnappedPoint {
         /** contains a `latitude` and `longitude` value. */
-        location: LatLng;
+        location: LatLngLiteralVerbose;
         /**
          * An integer that indicates the corresponding value in the original request.
          * Each value in the request should map to a snapped value in the response.
@@ -3281,7 +3288,7 @@ declare module '@google/maps' {
      */
     export interface TimeZoneRequest {
         /** a comma-separated `lat,lng` tuple (eg. `location=-33.86,151.20`), representing the location to look up. */
-        location:LatLng;
+        location: LatLng;
         /**
          * specifies the desired time as seconds since midnight, January 1, 1970 UTC.
          * The Time Zone API uses the timestamp to determine whether or not Daylight Savings should be applied,
