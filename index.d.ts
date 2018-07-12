@@ -778,7 +778,8 @@ declare module '@google/maps' {
          * Japanese address.
          */
         ward = 'ward',
-        /** indicates a first-order civil entity below a locality. For some locations may receive one of the additional types:
+        /**
+         * indicates a first-order civil entity below a locality. For some locations may receive one of the additional types:
          * `sublocality_level_1` to `sublocality_level_5`. Each sublocality level is a civil entity. Larger numbers indicate a smaller
          * geographic area.
          */
@@ -1485,7 +1486,7 @@ declare module '@google/maps' {
          * The Places API returns up to 20 `establishment` results per query.
          * Additionally, political results may be returned which serve to identify the area of the request.
          */
-        results: SearchResult[];
+        results: PlaceSearchResult[];
         /** may contain a set of attributions about this listing which must be displayed to the user (some listings may not have attribution). */
         html_attributions: string[];
         /**
@@ -1524,7 +1525,7 @@ declare module '@google/maps' {
      * Even if the service returns no results (such as if the `location` is remote) it still returns an empty `results` array.
      * XML responses consist of zero or more `<result>` elements.
      */
-    export interface SearchResult {
+    export interface PlaceSearchResult {
         /** contains the URL of a recommended icon which may be displayed to the user when indicating this result. */
         icon: string;
         /**
@@ -1595,10 +1596,9 @@ declare module '@google/maps' {
         rating: number;
         /**
          * contains an array of feature types describing the given result.
-         * See the [list of supported types](https://developers.google.com/places/web-service/supported_types#table2).
          * XML responses include multiple `<type>` elements if more than one type is assigned to the result.
          */
-        types: AddressType[];
+        types: (PlaceType1 | PlaceType2)[];
         /**
          * contains a feature name of a nearby location. Often this feature refers to a street or neighborhood within the given results.
          * The `vicinity` property is only returned for a Nearby Search.
@@ -1693,6 +1693,156 @@ declare module '@google/maps' {
          * indicating that the alternative place ID is recognised by your application only.
          */
         scope: PlaceIdScope.APP;
+    }
+
+    /**
+     * Table 1: Types supported in place search and addition
+     * 
+     * You can use the following values in the types filter for place searches and when adding a place.
+     * 
+     * @see https://developers.google.com/places/web-service/supported_types#table1
+     */
+    export enum PlaceType1 {
+        accounting = 'accounting',
+        airport = 'airport',
+        amusement_park = 'amusement_park',
+        aquarium = 'aquarium',
+        art_gallery = 'art_gallery',
+        atm = 'atm',
+        bakery = 'bakery',
+        bank = 'bank',
+        bar = 'bar',
+        beauty_salon = 'beauty_salon',
+        bicycle_store = 'bicycle_store',
+        book_store = 'book_store',
+        bowling_alley = 'bowling_alley',
+        bus_station = 'bus_station',
+        cafe = 'cafe',
+        campground = 'campground',
+        car_dealer = 'car_dealer',
+        car_rental = 'car_rental',
+        car_repair = 'car_repair',
+        car_wash = 'car_wash',
+        casino = 'casino',
+        cemetery = 'cemetery',
+        church = 'church',
+        city_hall = 'city_hall',
+        clothing_store = 'clothing_store',
+        convenience_store = 'convenience_store',
+        courthouse = 'courthouse',
+        dentist = 'dentist',
+        department_store = 'department_store',
+        doctor = 'doctor',
+        electrician = 'electrician',
+        electronics_store = 'electronics_store',
+        embassy = 'embassy',
+        fire_station = 'fire_station',
+        florist = 'florist',
+        funeral_home = 'funeral_home',
+        furniture_store = 'furniture_store',
+        gas_station = 'gas_station',
+        gym = 'gym',
+        hair_care = 'hair_care',
+        hardware_store = 'hardware_store',
+        hindu_temple = 'hindu_temple',
+        home_goods_store = 'home_goods_store',
+        hospital = 'hospital',
+        insurance_agency = 'insurance_agency',
+        jewelry_store = 'jewelry_store',
+        laundry = 'laundry',
+        lawyer = 'lawyer',
+        library = 'library',
+        liquor_store = 'liquor_store',
+        local_government_office = 'local_government_office',
+        locksmith = 'locksmith',
+        lodging = 'lodging',
+        meal_delivery = 'meal_delivery',
+        meal_takeaway = 'meal_takeaway',
+        mosque = 'mosque',
+        movie_rental = 'movie_rental',
+        movie_theater = 'movie_theater',
+        moving_company = 'moving_company',
+        museum = 'museum',
+        night_club = 'night_club',
+        painter = 'painter',
+        park = 'park',
+        parking = 'parking',
+        pet_store = 'pet_store',
+        pharmacy = 'pharmacy',
+        physiotherapist = 'physiotherapist',
+        plumber = 'plumber',
+        police = 'police',
+        post_office = 'post_office',
+        real_estate_agency = 'real_estate_agency',
+        restaurant = 'restaurant',
+        roofing_contractor = 'roofing_contractor',
+        rv_park = 'rv_park',
+        school = 'school',
+        shoe_store = 'shoe_store',
+        shopping_mall = 'shopping_mall',
+        spa = 'spa',
+        stadium = 'stadium',
+        storage = 'storage',
+        store = 'store',
+        subway_station = 'subway_station',
+        supermarket = 'supermarket',
+        synagogue = 'synagogue',
+        taxi_stand = 'taxi_stand',
+        train_station = 'train_station',
+        transit_station = 'transit_station',
+        travel_agency = 'travel_agency',
+        veterinary_care = 'veterinary_care',
+        zoo = 'zoo',
+    }
+
+    /**
+     * Table 2: Additional types returned by the Places service
+     * 
+     * The following types may be returned in the results of a place search, in addition to the types in table 1 above.
+     * For more details on these types, refer to [Address Types](https://developers.google.com/maps/documentation/geocoding/intro#Types)
+     * in Geocoding Responses.
+     * 
+     * @see https://developers.google.com/places/web-service/supported_types#table2
+     */
+    export enum PlaceType2 {
+        administrative_area_level_1 = 'administrative_area_level_1',
+        administrative_area_level_2 = 'administrative_area_level_2',
+        administrative_area_level_3 = 'administrative_area_level_3',
+        administrative_area_level_4 = 'administrative_area_level_4',
+        administrative_area_level_5 = 'administrative_area_level_5',
+        colloquial_area = 'colloquial_area',
+        country = 'country',
+        establishment = 'establishment',
+        finance = 'finance',
+        floor = 'floor',
+        food = 'food',
+        general_contractor = 'general_contractor',
+        geocode = 'geocode',
+        health = 'health',
+        intersection = 'intersection',
+        locality = 'locality',
+        natural_feature = 'natural_feature',
+        neighborhood = 'neighborhood',
+        place_of_worship = 'place_of_worship',
+        political = 'political',
+        point_of_interest = 'point_of_interest',
+        post_box = 'post_box',
+        postal_code = 'postal_code',
+        postal_code_prefix = 'postal_code_prefix',
+        postal_code_suffix = 'postal_code_suffix',
+        postal_town = 'postal_town',
+        premise = 'premise',
+        room = 'room',
+        route = 'route',
+        street_address = 'street_address',
+        street_number = 'street_number',
+        sublocality = 'sublocality',
+        sublocality_level_4 = 'sublocality_level_4',
+        sublocality_level_5 = 'sublocality_level_5',
+        sublocality_level_3 = 'sublocality_level_3',
+        sublocality_level_2 = 'sublocality_level_2',
+        sublocality_level_1 = 'sublocality_level_1',
+        subpremise = 'subpremise',
     }
 
     export interface GeocodingRequest {
@@ -2472,7 +2622,7 @@ declare module '@google/maps' {
          * Restricts the results to places matching the specified type.
          * Only one type may be specified (if more than one type is provided, all types following the first entry are ignored).
          */
-        type?: AddressType;
+        type?: PlaceType1;
     }
 
     /**
@@ -2924,7 +3074,7 @@ declare module '@google/maps' {
     }
 
     /**
-     * f both `result_type` and `location_type` filters are present then the API returns only those results that match both the
+     * If both `result_type` and `location_type` filters are present then the API returns only those results that match both the
      * `result_type` and the `location_type` values. If none of the filter values are acceptable, the API returns `ZERO_RESULTS`.
      */
     export interface ReverseGeocodingRequest {
@@ -2957,7 +3107,7 @@ declare module '@google/maps' {
          * then discards those results that do not match the specified address type(s).
          * Note: This parameter is available only for requests that include an API key or a client ID.
          */
-        result_type?: ReverseGeocodingResultType;
+        result_type?: AddressType;
         /**
          * A filter of one or more location types, separated by a pipe (`|`).
          * If the parameter contains multiple location types, the API returns all addresses that match any of the types.
@@ -2967,84 +3117,6 @@ declare module '@google/maps' {
          * Note: This parameter is available only for requests that include an API key or a client ID.
          */
         location_type?: ReverseGeocodingLocationType;
-    }
-
-    /** Supported values for a Reverse Geocoding request. */
-    export enum ReverseGeocodingResultType {
-        /** indicates a precise street address. */
-        street_address = 'street_address',
-        /** indicates a named route (such as "US 101"). */
-        route = 'route',
-        /** indicates a major intersection, usually of two major roads. */
-        intersection = 'intersection',
-        /** indicates a political entity. Usually, this type indicates a polygon of some civil administration. */
-        political = 'political',
-        /** indicates the national political entity, and is typically the highest order type returned by the Geocoder. */
-        country = 'country',
-        /**
-         * indicates a first-order civil entity below the country level. Within the United States, these administrative levels are states.
-         * Not all nations exhibit these administrative levels. In most cases, `administrative_area_level_1` short names
-         * will closely match ISO 3166-2 subdivisions and other widely circulated lists;
-         * however this is not guaranteed as our geocoding results are based on a variety of signals and location data.
-         */
-        administrative_area_level_1 = 'administrative_area_level_1',
-        /**
-         * indicates a second-order civil entity below the country level. Within the United States, these administrative levels are counties.
-         * Not all nations exhibit these administrative levels.
-         */
-        administrative_area_level_2 = 'administrative_area_level_2',
-        /**
-         * indicates a third-order civil entity below the country level.
-         * This type indicates a minor civil division. Not all nations exhibit these administrative levels.
-         */
-        administrative_area_level_3 = 'administrative_area_level_3',
-        /**
-         * indicates a fourth-order civil entity below the country level.
-         * This type indicates a minor civil division. Not all nations exhibit these administrative levels.
-         */
-        administrative_area_level_4 = 'administrative_area_level_4',
-        /**
-         * indicates a fifth-order civil entity below the country level.
-         * This type indicates a minor civil division. Not all nations exhibit these administrative levels.
-         */
-        administrative_area_level_5 = 'administrative_area_level_5',
-        /** indicates a commonly-used alternative name for the entity. */
-        colloquial_area = 'colloquial_area',
-        /** indicates an incorporated city or town political entity. */
-        locality = 'locality',
-        /**
-         * indicates a specific type of Japanese locality, to facilitate distinction between multiple locality components within a
-         * Japanese address.
-         */
-        ward = 'ward',
-        /**
-         * indicates a first-order civil entity below a locality. For some locations may receive one of the additional types:
-         * `sublocality_level_1` to `sublocality_level_5`. Each sublocality level is a civil entity.
-         * Larger numbers indicate a smaller geographic area.
-         */
-        sublocality = 'sublocality',
-        /** indicates a named neighborhood. */
-        neighborhood = 'neighborhood',
-        /** indicates a named location, usually a building or collection of buildings with a common name. */
-        premise = 'premise',
-        /**
-         * indicates a first-order entity below a named location, usually a singular building within a collection of buildings
-         * with a common name.
-         */
-        subpremise = 'subpremise',
-        /** indicates a postal code as used to address postal mail within the country. */
-        postal_code = 'postal_code',
-        /** indicates a prominent natural feature. */
-        natural_feature = 'natural_feature',
-        /** indicates an airport. */
-        airport = 'airport',
-        /** indicates a named park. */
-        park = 'park',
-        /**
-         * indicates a named point of interest. Typically, these "POI"s are prominent local entities that don't easily fit in another category,
-         * such as "Empire State Building" or "Statue of Liberty.
-         */
-        point_of_interest = 'point_of_interest',
     }
 
     export enum ReverseGeocodingLocationType {
