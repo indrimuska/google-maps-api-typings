@@ -4,7 +4,7 @@ This project contains the TypeScript interface declaration of the [`@google/maps
 
 It also provides inline documentation from the official [Google Maps Documentation](https://developers.google.com/maps/documentation/) platform.
 
-![Google Maps API Typings Example](google-maps-api-typings.gif)
+![Google Maps API Typings Example](https://raw.githubusercontent.com/indrimuska/google-maps-api-typings/master/google-maps-api-typings.gif)
 
 ## Installation
 

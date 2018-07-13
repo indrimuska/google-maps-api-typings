@@ -1,6 +1,6 @@
 {
   "name": "google-maps-api-typings",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "TypeScript typings for `@google/maps` Node.JS API project.",
   "types": "index.d.ts",
   "author": "Indri Muska <indrimuska@gmail.com>",
