@@ -18,11 +18,12 @@ npm i google-maps-api-typings --save-dev
 ## Usage
 
 ```
-import { createClient, Language } from "@google/maps";
+import 'google-maps-api-typings';
+import { createClient } from "@google/maps";
 
 const client = createClient({
     key: 'my-google-maps-api-key',
-    language: Language.Japanese,
+    language: 'jp',
     Promise: Promise
 });
 
