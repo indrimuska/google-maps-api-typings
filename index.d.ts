@@ -3082,7 +3082,7 @@ declare module '@google/maps' {
      */
     export interface QueryAutocompleteResult {
         /** contains the human-readable name for the returned result. For establishment results, this is usually the business name. */
-        description
+        description: string;
         /**
          * contains an array of terms identifying each section of the returned description
          * (a section of the description is generally terminated with a comma).
