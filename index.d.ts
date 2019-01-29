@@ -3092,7 +3092,7 @@ declare module '@google/maps' {
          * contains an `offset` value and a `length`.
          * These describe the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
          */
-        matched_substring: PredictionSubstring[];
+        matched_substrings: PredictionSubstring[];
     }
 
     /** A Radar Search request must include at least one of `keyword`, `name`, or `type`. */
