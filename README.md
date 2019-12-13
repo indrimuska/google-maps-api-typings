@@ -1,3 +1,5 @@
+> # This package is now available in DefinitelyTyped: [@google/maps](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/google__maps)
+
 # Google Maps API Typings
 
 This project contains the TypeScript interface declaration of the [`@google/maps`](https://github.com/googlemaps/google-maps-services-js) Node.JS API project.
